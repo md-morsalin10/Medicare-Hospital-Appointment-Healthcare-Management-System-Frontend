@@ -4,19 +4,20 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Image as ImageIcon, 
-  Eye, 
-  EyeOff, 
-  Stethoscope, 
-  UserCheck, 
+import {
+  User,
+  Mail,
+  Lock,
+  Image as ImageIcon,
+  Eye,
+  EyeOff,
+  Stethoscope,
+  UserCheck,
   ArrowRight,
   ShieldCheck,
   AlertCircle
 } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -35,12 +36,12 @@ const RegisterPage = () => {
 
   // Password validation check
   const validatePassword = (pass) => {
-    const hasMinLength = pass.length >= 6;
+    const hasMinLength = pass.length >= 5;
     const hasNumber = /\d/.test(pass);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
 
     if (!hasMinLength) {
-      return 'Password must be at least 6 characters long.';
+      return 'Password must be at least 5 characters long.';
     }
     if (!hasNumber) {
       return 'Password must include at least one number.';
@@ -81,14 +82,32 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      // TODO: Connect Firebase / Better-Auth / Backend API Register logic here
-      console.log('Registration Data:', formData);
+      // ✅ Better Auth-এ Custom Field পাঠানোর সঠিক নিয়ম
+      const { data, error } = await authClient.signUp.email({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        image: formData.photoUrl,
+        // Custom fields must be passed via additionalFields or alongside if configured on server
+        role: formData.role,
+      }, {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onSuccess: () => {
+          toast.success('Account created successfully! Welcome to MediCare Connect.');
+          setLoading(false);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message || 'Registration failed!');
+          setLoading(false);
+        }
+      });
 
-      // Simulation of successful registration
-      setTimeout(() => {
-        toast.success('Account created successfully! Welcome to MediCare Connect.');
+      if (error) {
+        toast.error(error.message || 'Registration failed!');
         setLoading(false);
-      }, 1200);
+      }
 
     } catch (error) {
       toast.error(error?.message || 'Registration failed! Please try again.');
@@ -138,11 +157,10 @@ const RegisterPage = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, role: 'patient' }))}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              formData.role === 'patient'
-                ? 'bg-[#0E7490] text-white shadow-md'
-                : 'text-gray-600 hover:text-[#0E7490]'
-            }`}
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${formData.role === 'patient'
+              ? 'bg-[#0E7490] text-white shadow-md'
+              : 'text-gray-600 hover:text-[#0E7490]'
+              }`}
           >
             <UserCheck className="w-4 h-4" />
             Patient
@@ -151,11 +169,10 @@ const RegisterPage = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, role: 'doctor' }))}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              formData.role === 'doctor'
-                ? 'bg-[#0E7490] text-white shadow-md'
-                : 'text-gray-600 hover:text-[#0E7490]'
-            }`}
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${formData.role === 'doctor'
+              ? 'bg-[#0E7490] text-white shadow-md'
+              : 'text-gray-600 hover:text-[#0E7490]'
+              }`}
           >
             <Stethoscope className="w-4 h-4" />
             Doctor
@@ -164,7 +181,7 @@ const RegisterPage = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
+
           {/* Full Name */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
@@ -236,11 +253,10 @@ const RegisterPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full pl-11 pr-11 py-3 rounded-xl bg-[#F8FAFC] border text-gray-800 text-sm focus:outline-none transition-all ${
-                  passwordError
-                    ? 'border-red-400 focus:ring-2 focus:ring-red-200'
-                    : 'border-gray-200 focus:border-[#0E7490] focus:ring-2 focus:ring-[#0E7490]/20'
-                }`}
+                className={`w-full pl-11 pr-11 py-3 rounded-xl bg-[#F8FAFC] border text-gray-800 text-sm focus:outline-none transition-all ${passwordError
+                  ? 'border-red-400 focus:ring-2 focus:ring-red-200'
+                  : 'border-gray-200 focus:border-[#0E7490] focus:ring-2 focus:ring-[#0E7490]/20'
+                  }`}
               />
               <button
                 type="button"
