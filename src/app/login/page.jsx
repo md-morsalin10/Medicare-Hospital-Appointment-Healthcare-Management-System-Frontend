@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
   ArrowRight,
   LogIn
 } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -34,6 +35,12 @@ const LoginPage = () => {
     try {
       // TODO: Connect Firebase / Better-Auth / Backend API Login logic here
       console.log('Login Credentials:', formData);
+      const { data, error } = await authClient.signIn.email({
+        email: formData.email, 
+        password: formData.password, 
+        rememberMe: true,
+        callbackURL: "/",
+      });
 
       // Simulation of successful login
       setTimeout(() => {
@@ -86,7 +93,7 @@ const LoginPage = () => {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
+
           {/* Email Address */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
@@ -112,8 +119,8 @@ const LoginPage = () => {
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Password
               </label>
-              <Link 
-                href="/forgot-password" 
+              <Link
+                href="/forgot-password"
                 className="text-xs font-semibold text-[#0E7490] hover:underline"
               >
                 Forgot Password?
