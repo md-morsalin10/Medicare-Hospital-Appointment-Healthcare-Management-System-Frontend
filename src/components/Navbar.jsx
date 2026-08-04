@@ -33,9 +33,17 @@ export default function Navbar() {
     { name: 'Contact', path: '/contact' },
   ];
 
+  // Role-based dashboard path
+  const roleMap = {
+    admin: '/dashboard/admin',
+    doctor: '/dashboard/doctor',
+    patient: '/dashboard/patient',
+  };
+  const dashboardPath = roleMap[user?.role] || '/dashboard/patient';
+
   // Dynamically add Dashboard link if user is logged in
   const navLinks = user 
-    ? [...baseNavLinks, { name: 'Dashboard', path: '/dashboard' }]
+    ? [...baseNavLinks, { name: 'Dashboard', path: dashboardPath }]
     : baseNavLinks;
 
   return (
@@ -112,7 +120,7 @@ export default function Navbar() {
                     </div>
 
                     <Link
-                      href="/dashboard"
+                      href={dashboardPath}
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                     >

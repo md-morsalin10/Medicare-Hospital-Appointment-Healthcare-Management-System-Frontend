@@ -1,20 +1,22 @@
+import { DashboardSideBar } from "@/components/Dashboard/DashboardSidebar";
+import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 
-import { DashboardSideBar } from '@/components/Dashboard/DashboardSidebar';
-import React from 'react';
+export default function DashboardLayout({ children }) {
+  return (
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* ── Sidebar ── */}
+      <DashboardSideBar />
 
-const DashboardLayout = ({ children }) => {
-    return (
-        <div>
-            <aside>
-                <DashboardSideBar />
-            </aside>
-            <div>
-                <main>
-                    {children}
-                </main>
-            </div>
-        </div>
-    );
-};
+      {/* ── Main Content Area ── */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        {/* Sticky Topbar */}
+        <DashboardNavbar />
 
-export default DashboardLayout;
+        {/* Scrollable Page Content */}
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
