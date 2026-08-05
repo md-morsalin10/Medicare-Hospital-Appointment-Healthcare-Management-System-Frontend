@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -23,44 +23,54 @@ import {
   LogOut,
   X,
   Menu,
+  Home,
+  ChevronUp,
 } from "lucide-react";
 
 // ─── Nav Item Config ───────────────────────────────────────────
 const doctorNavItems = [
-  { icon: LayoutDashboard, href: "/dashboard/doctor",              label: "Overview",          section: null },
-  { icon: Calendar,        href: "/dashboard/doctor/appointments", label: "Appointments",      section: "MANAGE" },
-  { icon: Clock,           href: "/dashboard/doctor/schedules",    label: "Manage Schedule",   section: null },
-  { icon: FilePlus,        href: "/dashboard/doctor/prescriptions",label: "Prescriptions",     section: null },
-  { icon: Settings,        href: "/dashboard/doctor/profile",      label: "Profile Settings",  section: "SETTINGS" },
+  { icon: LayoutDashboard, href: "/dashboard/doctor", label: "Overview" },
+  { icon: Calendar, href: "/dashboard/doctor/appointments", label: "Appointments" },
+  { icon: Clock, href: "/dashboard/doctor/schedules", label: "Manage Schedule" },
+  { icon: FilePlus, href: "/dashboard/doctor/prescriptions", label: "Prescriptions" },
+  { icon: Settings, href: "/dashboard/doctor/profile", label: "Profile Settings" },
 ];
 
 const patientNavItems = [
-  { icon: LayoutDashboard, href: "/dashboard/patient",                  label: "Overview",        section: null },
-  { icon: Calendar,        href: "/dashboard/patient/appointments",      label: "My Appointments", section: "HEALTH" },
-  { icon: Stethoscope,     href: "/dashboard/patient/prescriptions",     label: "Prescriptions",   section: null },
-  { icon: Star,            href: "/dashboard/patient/reviews",           label: "My Reviews",      section: null },
-  { icon: CreditCard,      href: "/dashboard/patient/payment-history",   label: "Payment History", section: null },
-  { icon: Settings,        href: "/dashboard/patient/profile",           label: "Profile",         section: "SETTINGS" },
+  { icon: LayoutDashboard, href: "/dashboard/patient", label: "Overview" },
+  { icon: Calendar, href: "/dashboard/patient/appointments", label: "My Appointments" },
+  { icon: Stethoscope, href: "/dashboard/patient/prescriptions", label: "Prescriptions" },
+  { icon: Star, href: "/dashboard/patient/reviews", label: "My Reviews" },
+  { icon: CreditCard, href: "/dashboard/patient/payment-history", label: "Payment History" },
+  { icon: Settings, href: "/dashboard/patient/profile", label: "Profile" },
 ];
 
 const adminNavItems = [
-  { icon: LayoutDashboard, href: "/dashboard/admin",                label: "Overview",         section: null },
-  { icon: Users,           href: "/dashboard/admin/manage-users",   label: "Manage Users",     section: "MANAGEMENT" },
-  { icon: UserCheck,       href: "/dashboard/admin/manage-doctors", label: "Manage Doctors",   section: null },
-  { icon: FileText,        href: "/dashboard/admin/appointments",   label: "All Appointments", section: null },
-  { icon: CreditCard,      href: "/dashboard/admin/transactions",   label: "Transactions",     section: null },
-  { icon: BarChart2,       href: "/dashboard/admin/analytics",      label: "Analytics",        section: "REPORTS" },
+  { icon: LayoutDashboard, href: "/dashboard/admin", label: "Overview" },
+  { icon: Users, href: "/dashboard/admin/manage-users", label: "Manage Users" },
+  { icon: UserCheck, href: "/dashboard/admin/manage-doctors", label: "Manage Doctors" },
+  { icon: FileText, href: "/dashboard/admin/appointments", label: "All Appointments" },
+  { icon: CreditCard, href: "/dashboard/admin/transactions", label: "Transactions" },
+  { icon: BarChart2, href: "/dashboard/admin/analytics", label: "Analytics" },
 ];
 
 const roleMeta = {
-  doctor:  { label: "Doctor Panel",   gradient: "from-[#0E7490] to-[#0891B2]" },
-  admin:   { label: "Admin Panel",    gradient: "from-[#7C3AED] to-[#9333EA]" },
-  patient: { label: "Patient Portal", gradient: "from-[#059669] to-[#10B981]" },
+  doctor: { label: "Doctor Panel", gradient: "from-[#0E7490] to-[#0891B2]", badgeBg: "bg-cyan-100 text-cyan-800" },
+  admin: { label: "Admin Panel", gradient: "from-[#7C3AED] to-[#9333EA]", badgeBg: "bg-purple-100 text-purple-800" },
+  patient: { label: "Patient Portal", gradient: "from-[#059669] to-[#10B981]", badgeBg: "bg-emerald-100 text-emerald-800" },
 };
 
 // ─── Single Nav Link ───────────────────────────────────────────
 function NavLink({ item, pathname, onClick }) {
-  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+  const isExactOverview =
+    item.href === "/dashboard/patient" ||
+    item.href === "/dashboard/doctor" ||
+    item.href === "/dashboard/admin";
+
+  const isActive = isExactOverview
+    ? pathname === item.href
+    : pathname === item.href || pathname?.startsWith(item.href + "/");
+
   return (
     <Link
       href={item.href}
@@ -79,13 +89,15 @@ function NavLink({ item, pathname, onClick }) {
         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#0E7490] rounded-r-full" />
       )}
 
-      <span className={`
+      <span
+        className={`
         flex items-center justify-center w-8 h-8 rounded-lg transition-all
         ${isActive
-          ? "bg-[#0E7490] text-white shadow-lg shadow-[#0E7490]/30"
-          : "bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
-        }
-      `}>
+            ? "bg-[#0E7490] text-white shadow-lg shadow-[#0E7490]/30"
+            : "bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
+          }
+      `}
+      >
         <item.icon size={15} />
       </span>
 
@@ -102,28 +114,39 @@ function SidebarContent({ onClose }) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const currentRole = user?.role || "patient";
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const navMap = { doctor: doctorNavItems, patient: patientNavItems, admin: adminNavItems };
   const navItems = navMap[currentRole] || patientNavItems;
   const meta = roleMeta[currentRole] || roleMeta.patient;
 
   const handleSignOut = async () => {
-    await authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/login"; } } });
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/login";
+        },
+      },
+    });
   };
 
-  // Group items by section
-  const grouped = navItems.reduce((acc, item) => {
-    const key = item.section || "__default";
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(item);
-    return acc;
-  }, {});
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="flex flex-col h-full bg-[#0B1120] text-white overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#0B1120] text-white overflow-hidden">
       
       {/* ── Top Brand Bar ── */}
-      <div className={`bg-gradient-to-r ${meta.gradient} px-5 py-5`}>
+      <div className={`bg-gradient-to-r ${meta.gradient} px-5 py-5 flex-shrink-0`}>
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
@@ -131,38 +154,26 @@ function SidebarContent({ onClose }) {
             </div>
             <div>
               <p className="text-white font-bold text-base leading-none">MediCare</p>
-              <p className="text-white/70 text-[10px] uppercase tracking-widest mt-0.5">{meta.label}</p>
+              <p className="text-white/70 text-[10px] uppercase tracking-widest mt-0.5">
+                {meta.label}
+              </p>
             </div>
           </Link>
 
           {/* Mobile close button */}
           {onClose && (
-            <button onClick={onClose} className="lg:hidden p-1.5 hover:bg-white/20 rounded-lg transition">
+            <button
+              onClick={onClose}
+              className="lg:hidden p-1.5 hover:bg-white/20 rounded-lg transition"
+            >
               <X size={18} className="text-white" />
             </button>
           )}
         </div>
-
-        {/* User mini card */}
-        <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-3 flex items-center gap-3">
-          {isPending ? (
-            <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
-          ) : user?.image ? (
-            <img src={user.image} alt={user.name} className="w-9 h-9 rounded-full object-cover border-2 border-white/30" />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm text-white">
-              {user?.name?.[0]?.toUpperCase() || "U"}
-            </div>
-          )}
-          <div className="overflow-hidden flex-1">
-            <p className="text-white font-semibold text-sm truncate">{user?.name || "Loading..."}</p>
-            <p className="text-white/60 text-[11px] truncate">{user?.email || ""}</p>
-          </div>
-        </div>
       </div>
 
-      {/* ── Navigation ── */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      {/* ── Navigation List ── */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {isPending ? (
           <div className="space-y-2">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -170,43 +181,96 @@ function SidebarContent({ onClose }) {
             ))}
           </div>
         ) : (
-          Object.entries(grouped).map(([section, items]) => (
-            <div key={section} className="mb-2">
-              {section !== "__default" && (
-                <p className="text-[10px] text-slate-600 font-semibold uppercase tracking-widest px-3 py-2">
-                  {section}
-                </p>
-              )}
-              <div className="space-y-0.5">
-                {items.map((item) => (
-                  <NavLink key={item.href} item={item} pathname={pathname} onClick={onClose} />
-                ))}
-              </div>
-            </div>
+          navItems.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              onClick={onClose}
+            />
           ))
         )}
       </nav>
 
-      {/* ── Divider + Quick links ── */}
-      <div className="px-3 pb-3 space-y-1 border-t border-white/5 pt-3">
-        <Link
-          href="/"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 hover:text-white hover:bg-white/5 transition-all"
-        >
-          <span className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-            <Activity size={15} />
-          </span>
-          Go to Main Site
-        </Link>
+      {/* ── Bottom User Profile & Popover Dropdown Menu ── */}
+      <div className="p-3 border-t border-white/10 relative flex-shrink-0" ref={dropdownRef}>
+        
+        {/* Dropdown Menu (Opens Above the Profile Card) */}
+        {dropdownOpen && (
+          <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            {/* User Info Header */}
+            <div className="px-4 py-3 bg-gradient-to-r from-[#0E7490]/10 to-transparent border-b border-gray-100">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Signed in as</p>
+              <p className="text-sm font-bold text-gray-800 truncate">{user?.name || "User"}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.email || ""}</p>
+            </div>
+
+            {/* Menu Links */}
+            <div className="py-1.5">
+              <Link
+                href="/"
+                onClick={() => {
+                  setDropdownOpen(false);
+                  if (onClose) onClose();
+                }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#0E7490] transition-colors"
+              >
+                <Home size={16} className="text-gray-400" />
+                Home Page
+              </Link>
+            </div>
+
+            {/* Sign Out Action */}
+            <div className="border-t border-gray-100 py-1.5">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors"
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Profile Button (Trigger) */}
         <button
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className={`w-full text-left rounded-xl p-2.5 flex items-center gap-3 transition-all ${
+            dropdownOpen ? "bg-white/15" : "bg-white/5 hover:bg-white/10"
+          }`}
         >
-          <span className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-            <LogOut size={15} />
-          </span>
-          Sign Out
+          {isPending ? (
+            <div className="w-9 h-9 rounded-full bg-white/20 animate-pulse" />
+          ) : user?.image ? (
+            <img
+              src={user.image}
+              alt={user.name}
+              className="w-9 h-9 rounded-full object-cover border border-white/20"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-[#0E7490] flex items-center justify-center font-bold text-sm text-white">
+              {user?.name?.[0]?.toUpperCase() || "U"}
+            </div>
+          )}
+
+          <div className="overflow-hidden flex-1">
+            <p className="text-white font-semibold text-sm truncate leading-tight">
+              {user?.name || "User"}
+            </p>
+            <p className="text-slate-400 text-[11px] truncate mt-0.5">
+              {user?.email || "Manage Account"}
+            </p>
+          </div>
+
+          <ChevronUp
+            size={16}
+            className={`text-slate-400 transition-transform duration-200 ${
+              dropdownOpen ? "rotate-180 text-white" : ""
+            }`}
+          />
         </button>
+
       </div>
     </div>
   );
