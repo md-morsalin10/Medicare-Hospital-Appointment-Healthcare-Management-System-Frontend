@@ -1,7 +1,4 @@
 "use client";
-
-import { authClient } from "@/lib/auth-client";
-
 const baseUrl = process.env.NEXT_PUBLIC_URL;
 
 
