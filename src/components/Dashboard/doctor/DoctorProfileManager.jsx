@@ -8,7 +8,7 @@ import ProfileForm from "./ProfileForm";
 import ProfileCard from "./ProfileCard";
 import { authClient } from "@/lib/auth-client";
 
-export default function DoctorProfileManager({ initialProfile = null }) {
+export default function DoctorProfileManager({ initialProfile }) {
   const [profile, setProfile] = useState(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);

@@ -6,7 +6,7 @@ export const serverFetch = async (path) => {
     // console.log(token, "from token")
     const res = await fetch(`${baseUrl}${path}`, {
         headers: {
-            "authorization": `Bearer ${token}`
+            // "authorization": `Bearer ${token}`
         },
         cache: 'no-store'
     })
