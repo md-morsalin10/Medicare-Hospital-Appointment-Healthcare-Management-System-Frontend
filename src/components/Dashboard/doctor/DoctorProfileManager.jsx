@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
-import { Plus } from "lucide-react";
 import { createDoctorProfile } from "@/lib/action/doctorProfile";
 import NoProfileCard from "./NoProfileCard";
 import ProfileForm from "./ProfileForm";
 import ProfileCard from "./ProfileCard";
+import { authClient } from "@/lib/auth-client";
 
 export default function DoctorProfileManager({ initialProfile = null }) {
   const [profile, setProfile] = useState(initialProfile);
@@ -14,73 +14,84 @@ export default function DoctorProfileManager({ initialProfile = null }) {
   const [isCreating, setIsCreating] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Auth User Data
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  // Initial Form Data State
   const [formData, setFormData] = useState({
-    doctorName: profile?.doctorName || "",
-    specialization: profile?.specialization || "Cardiology",
-    qualifications: profile?.qualifications || "",
-    experience: profile?.experience || "",
-    consultationFee: profile?.consultationFee || "",
-    hospitalName: profile?.hospitalName || "",
-    profileImage: profile?.profileImage || "",
-    availableDays: profile?.availableDays || ["Mon", "Wed", "Fri"],
-    availableSlots: profile?.availableSlots || "09:00 AM - 01:00 PM",
-    verificationStatus: profile?.verificationStatus || "Pending",
+    doctorId: "",
+    doctorEmail: "",
+    doctorName: initialProfile?.doctorName || "",
+    specialization: initialProfile?.specialization || "Cardiology",
+    qualifications: initialProfile?.qualifications || "",
+    experience: initialProfile?.experience || "",
+    consultationFee: initialProfile?.consultationFee || "",
+    hospitalName: initialProfile?.hospitalName || "",
+    profileImage: initialProfile?.profileImage || "",
+    availableDays: initialProfile?.availableDays || ["Mon", "Wed", "Fri"],
+    availableSlots: initialProfile?.availableSlots || "09:00 AM - 01:00 PM",
+    verificationStatus: initialProfile?.verificationStatus || "Pending",
   });
 
   const cardRef = useRef(null);
 
-  // Smooth entrance animation with GSAP
+  // Animation
   useEffect(() => {
     if (cardRef.current) {
       gsap.fromTo(
         cardRef.current,
-        { opacity: 0, y: 20, scale: 0.99 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out" }
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.3 }
       );
     }
   }, [isCreating, isEditing]);
 
+  // Handle Input Changes
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle Days Toggle
   const handleDayToggle = (day) => {
-    setFormData((prev) => ({
-      ...prev,
-      availableDays: prev.availableDays.includes(day)
-        ? prev.availableDays.filter((d) => d !== day)
-        : [...prev.availableDays, day],
-    }));
+    const days = formData.availableDays.includes(day)
+      ? formData.availableDays.filter((d) => d !== day)
+      : [...formData.availableDays, day];
+    
+    setFormData({ ...formData, availableDays: days });
   };
 
+  // Handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
 
+    // Make sure doctorId & doctorEmail exist from session
+    const payload = {
+      ...formData,
+      doctorId: user?.id || formData.doctorId,
+      doctorEmail: user?.email || formData.doctorEmail,
+    };
+
     try {
-      await createDoctorProfile(formData);
-      setProfile(formData);
+      await createDoctorProfile(payload);
+      setProfile(payload);
       setIsCreating(false);
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving profile:", error);
-      alert("Failed to save profile. Please check server actions or API.");
+      alert("Failed to save profile.");
     } finally {
       setSaving(false);
     }
   };
 
-  // View 1: Empty Profile State
+  // View 1: No Profile
   if (!profile && !isCreating) {
-    return (
-      <NoProfileCard
-        cardRef={cardRef}
-        onCreateClick={() => setIsCreating(true)}
-      />
-    );
+    return <NoProfileCard cardRef={cardRef} onCreateClick={() => setIsCreating(true)} />;
   }
 
-  // View 2: Create / Edit Form
+  // View 2: Form (Create/Edit)
   if (isCreating || isEditing) {
     return (
       <ProfileForm
