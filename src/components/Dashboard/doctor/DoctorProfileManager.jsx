@@ -8,8 +8,13 @@ import ProfileForm from "./ProfileForm";
 import ProfileCard from "./ProfileCard";
 import { authClient } from "@/lib/auth-client";
 
-export default function DoctorProfileManager({ initialProfile }) {
-  const [profile, setProfile] = useState(initialProfile);
+export default function DoctorProfileManager({ initialProfile = null }) {
+  // যদি initialProfile খালি Array হয় ([]) বা falsy হয়, তবে null বানিয়ে নিন
+  const rawProfile = Array.isArray(initialProfile)
+    ? initialProfile.length > 0 ? initialProfile[0] : null
+    : initialProfile;
+
+  const [profile, setProfile] = useState(rawProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -22,19 +27,28 @@ export default function DoctorProfileManager({ initialProfile }) {
   const [formData, setFormData] = useState({
     doctorId: "",
     doctorEmail: "",
-    doctorName: initialProfile?.doctorName || "",
-    specialization: initialProfile?.specialization || "Cardiology",
-    qualifications: initialProfile?.qualifications || "",
-    experience: initialProfile?.experience || "",
-    consultationFee: initialProfile?.consultationFee || "",
-    hospitalName: initialProfile?.hospitalName || "",
-    profileImage: initialProfile?.profileImage || "",
-    availableDays: initialProfile?.availableDays || ["Mon", "Wed", "Fri"],
-    availableSlots: initialProfile?.availableSlots || "09:00 AM - 01:00 PM",
-    verificationStatus: initialProfile?.verificationStatus || "Pending",
+    doctorName: rawProfile?.doctorName || "",
+    specialization: rawProfile?.specialization || "Cardiology",
+    qualifications: rawProfile?.qualifications || "",
+    experience: rawProfile?.experience || "",
+    consultationFee: rawProfile?.consultationFee || "",
+    hospitalName: rawProfile?.hospitalName || "",
+    profileImage: rawProfile?.profileImage || "",
+    availableDays: rawProfile?.availableDays || ["Mon", "Wed", "Fri"],
+    availableSlots: rawProfile?.availableSlots || "09:00 AM - 01:00 PM",
+    verificationStatus: rawProfile?.verificationStatus || "Pending",
   });
 
   const cardRef = useRef(null);
+
+  // initialProfile পরিবর্তন হলে state আপডেট করার জন্য
+  useEffect(() => {
+    const activeData = Array.isArray(initialProfile)
+      ? initialProfile.length > 0 ? initialProfile[0] : null
+      : initialProfile;
+
+    setProfile(activeData);
+  }, [initialProfile]);
 
   // Animation
   useEffect(() => {
@@ -66,7 +80,6 @@ export default function DoctorProfileManager({ initialProfile }) {
     e.preventDefault();
     setSaving(true);
 
-    // Make sure doctorId & doctorEmail exist from session
     const payload = {
       ...formData,
       doctorId: user?.id || formData.doctorId,
@@ -86,7 +99,7 @@ export default function DoctorProfileManager({ initialProfile }) {
     }
   };
 
-  // View 1: No Profile
+  // View 1: No Profile (খালি অ্যারে বা null হলে এটি রেন্ডার হবে)
   if (!profile && !isCreating) {
     return <NoProfileCard cardRef={cardRef} onCreateClick={() => setIsCreating(true)} />;
   }
