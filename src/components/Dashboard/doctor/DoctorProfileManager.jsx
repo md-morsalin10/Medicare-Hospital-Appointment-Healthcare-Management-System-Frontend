@@ -9,7 +9,7 @@ import ProfileCard from "./ProfileCard";
 import { authClient } from "@/lib/auth-client";
 
 export default function DoctorProfileManager({ initialProfile = null }) {
-  // যদি initialProfile খালি Array হয় ([]) বা falsy হয়, তবে null বানিয়ে নিন
+  // যদি initialProfile খালি Array হয় ([]) বা falsy হয়, তবে null বানিয়ে নেওয়া হচ্ছে
   const rawProfile = Array.isArray(initialProfile)
     ? initialProfile.length > 0 ? initialProfile[0] : null
     : initialProfile;
@@ -23,7 +23,6 @@ export default function DoctorProfileManager({ initialProfile = null }) {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  // Initial Form Data State
   const [formData, setFormData] = useState({
     doctorId: "",
     doctorEmail: "",
@@ -34,20 +33,33 @@ export default function DoctorProfileManager({ initialProfile = null }) {
     consultationFee: rawProfile?.consultationFee || "",
     hospitalName: rawProfile?.hospitalName || "",
     profileImage: rawProfile?.profileImage || "",
-    availableDays: rawProfile?.availableDays || ["Mon", "Wed", "Fri"],
-    availableSlots: rawProfile?.availableSlots || "09:00 AM - 01:00 PM",
     verificationStatus: rawProfile?.verificationStatus || "Pending",
   });
 
   const cardRef = useRef(null);
 
-  // initialProfile পরিবর্তন হলে state আপডেট করার জন্য
   useEffect(() => {
     const activeData = Array.isArray(initialProfile)
       ? initialProfile.length > 0 ? initialProfile[0] : null
       : initialProfile;
 
     setProfile(activeData);
+    
+
+    if (activeData) {
+      setFormData({
+        doctorId: activeData.doctorId || "",
+        doctorEmail: activeData.doctorEmail || "",
+        doctorName: activeData.doctorName || "",
+        specialization: activeData.specialization || "Cardiology",
+        qualifications: activeData.qualifications || "",
+        experience: activeData.experience || "",
+        consultationFee: activeData.consultationFee || "",
+        hospitalName: activeData.hospitalName || "",
+        profileImage: activeData.profileImage || "",
+        verificationStatus: activeData.verificationStatus || "Pending",
+      });
+    }
   }, [initialProfile]);
 
   // Animation
@@ -64,15 +76,6 @@ export default function DoctorProfileManager({ initialProfile = null }) {
   // Handle Input Changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Handle Days Toggle
-  const handleDayToggle = (day) => {
-    const days = formData.availableDays.includes(day)
-      ? formData.availableDays.filter((d) => d !== day)
-      : [...formData.availableDays, day];
-    
-    setFormData({ ...formData, availableDays: days });
   };
 
   // Handle Submit
@@ -99,7 +102,7 @@ export default function DoctorProfileManager({ initialProfile = null }) {
     }
   };
 
-  // View 1: No Profile (খালি অ্যারে বা null হলে এটি রেন্ডার হবে)
+  // View 1: No Profile
   if (!profile && !isCreating) {
     return <NoProfileCard cardRef={cardRef} onCreateClick={() => setIsCreating(true)} />;
   }
@@ -113,7 +116,6 @@ export default function DoctorProfileManager({ initialProfile = null }) {
         saving={saving}
         isEditing={isEditing}
         onChange={handleChange}
-        onDayToggle={handleDayToggle}
         onSubmit={handleSubmit}
         onCancel={() => {
           setIsCreating(false);
