@@ -18,7 +18,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-const baseUrl = process.env.NEXT_PUBLIC_URL;
 
 export default function ScheduleList({ schedules = [], onRefresh, timeSlots = [] }) {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -44,6 +43,7 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
     setUpdating(true);
 
     try {
+      const baseUrl = process.env.NEXT_PUBLIC_URL;
       const res = await fetch(`${baseUrl}/api/schedules/${selectedSchedule._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -162,9 +162,8 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: index * 0.05 }}
-                className={`group relative bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-[#0E7490]/20 transition-all duration-300 overflow-hidden ${
-                  isDeleting ? "opacity-50 pointer-events-none" : ""
-                }`}
+                className={`group relative bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-[#0E7490]/20 transition-all duration-300 overflow-hidden ${isDeleting ? "opacity-50 pointer-events-none" : ""
+                  }`}
               >
                 {/* Top colored accent bar */}
                 <div className="h-1 bg-gradient-to-r from-[#0E7490] via-cyan-400 to-emerald-400" />

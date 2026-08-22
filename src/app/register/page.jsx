@@ -21,6 +21,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -39,6 +40,7 @@ const RegisterPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const router = useRouter();
 
   // Password validation check (Assignment standard: 6+ chars, 1 number, 1 special char)
   const validatePassword = (pass) => {
@@ -142,6 +144,7 @@ const RegisterPage = () => {
         onSuccess: () => {
           toast.success('Account created successfully! Welcome to MediCare Connect.');
           setLoading(false);
+          router.push('/login');
         },
         onError: (ctx) => {
           toast.error(ctx.error.message || 'Registration failed!');
@@ -189,11 +192,10 @@ const RegisterPage = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, role: 'patient' }))}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              formData.role === 'patient'
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${formData.role === 'patient'
                 ? 'bg-[#0E7490] text-white shadow-md'
                 : 'text-gray-600 hover:text-[#0E7490]'
-            }`}
+              }`}
           >
             <UserCheck className="w-4 h-4" />
             Patient
@@ -202,11 +204,10 @@ const RegisterPage = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, role: 'doctor' }))}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              formData.role === 'doctor'
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${formData.role === 'doctor'
                 ? 'bg-[#0E7490] text-white shadow-md'
                 : 'text-gray-600 hover:text-[#0E7490]'
-            }`}
+              }`}
           >
             <Stethoscope className="w-4 h-4" />
             Doctor
@@ -215,7 +216,7 @@ const RegisterPage = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
+
           {/* Full Name */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
@@ -301,11 +302,10 @@ const RegisterPage = () => {
             <div className="relative">
               <label
                 htmlFor="photo-upload"
-                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-dashed transition-all cursor-pointer ${
-                  formData.photoUrl
+                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-dashed transition-all cursor-pointer ${formData.photoUrl
                     ? 'border-emerald-500 bg-emerald-50/50 text-emerald-700'
                     : 'border-gray-300 bg-[#F8FAFC] hover:border-[#0E7490] text-gray-600'
-                }`}
+                  }`}
               >
                 {uploadingImage ? (
                   <>
@@ -349,11 +349,10 @@ const RegisterPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full pl-11 pr-11 py-3 rounded-xl bg-[#F8FAFC] border text-gray-800 text-sm focus:outline-none transition-all ${
-                  passwordError
+                className={`w-full pl-11 pr-11 py-3 rounded-xl bg-[#F8FAFC] border text-gray-800 text-sm focus:outline-none transition-all ${passwordError
                     ? 'border-red-400 focus:ring-2 focus:ring-red-200'
                     : 'border-gray-200 focus:border-[#0E7490] focus:ring-2 focus:ring-[#0E7490]/20'
-                }`}
+                  }`}
               />
               <button
                 type="button"
