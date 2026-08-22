@@ -1,13 +1,29 @@
 import { getAllDoctorsProfile } from '@/lib/api/doctors';
-import React from 'react';
+import FindDoctorsClient from './FindDoctorsClient';
 
 const DoctorPage = async () => {
     const doctorsData = await getAllDoctorsProfile();
 
-    console.log('Fetched Doctors Profile:', doctorsData);
+    const verifiedDoctors = Array.isArray(doctorsData) 
+        ? doctorsData.filter(doc => doc.verificationStatus === 'Verified')
+        : [];
+
     return (
-        <div>
-            doctor page
+        <div className="bg-slate-50 min-h-screen">
+            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+            {/* Header */}
+            <div className="space-y-2">
+                <h1 className="text-3xl sm:text-4xl font-black text-slate-800">
+                    Find a <span className="text-[#0E7490]">Specialist</span>
+                </h1>
+                <p className="text-sm sm:text-base font-medium text-slate-500 max-w-2xl">
+                    Book appointments with top-rated healthcare professionals. Filter by specialty, location, or consultation fee.
+                </p>
+            </div>
+
+            {/* Client Component */}
+            <FindDoctorsClient doctors={verifiedDoctors} />
+            </div>
         </div>
     );
 };
