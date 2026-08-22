@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Clock, Calendar, Users, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Clock, Loader2 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 import AddScheduleForm from "./AddScheduleForm";
 import DoctorInfoCard from "./DoctorInfoCard";
+import ScheduleList from "./ScheduleList";
+import { createDoctorSchedules } from "@/lib/action/schedules";
+import { getDoctorsScheduleById } from "@/lib/api/schedules";
 
 export default function ManageSchedulesClient({ doctor }) {
   const [schedules, setSchedules] = useState([]);
@@ -30,17 +32,41 @@ export default function ManageSchedulesClient({ doctor }) {
     "07:00 PM - 07:30 PM",
   ];
 
-  const doctorId = doctor?.doctorId || doctor?._id;
+  // Fix 1: _id কে অগ্রাধিকার দিন যদি ডাটাবেজে MongoDB ObjectId দিয়ে Schedule খোঁজা হয়
+  const targetDoctorId = doctor?._id || doctor?.doctorId;
 
-  // ব্যাকএন্ড থেকে শিডিউল লোড
   const fetchSchedules = async () => {
-    if (!doctorId) return;
+    if (!targetDoctorId) return;
     try {
       setFetching(true);
-      const res = await fetch(`http://localhost:5000/api/schedules?doctorId=${doctorId}`);
-      const data = await res.json();
-      setSchedules(data);
+      
+      // API call
+      const res = await getDoctorsScheduleById({ doctorId: targetDoctorId });
+
+      console.log("Fetched API Raw Response:", res); // Debugging log
+
+      // Fix 2: API Response Array নাকি Object (res.data / res.result) তা হ্যান্ডেল করা
+      let finalSchedules = [];
+      if (Array.isArray(res)) {
+        finalSchedules = res;
+      } else if (res && Array.isArray(res.data)) {
+        finalSchedules = res.data;
+      } else if (res && Array.isArray(res.result)) {
+        finalSchedules = res.result;
+      } else if (res && Array.isArray(res.schedules)) {
+        finalSchedules = res.schedules;
+      }
+
+      // যদি _id দিয়ে ডাটা না পাওয়া যায়, তবে fallback হিসেবে doctorId দিয়ে চেষ্টা করে দেখতে পারেন
+      if (finalSchedules.length === 0 && doctor?.doctorId && targetDoctorId !== doctor?.doctorId) {
+        const fallbackRes = await getDoctorsScheduleById({ doctorId: doctor.doctorId });
+        if (Array.isArray(fallbackRes)) finalSchedules = fallbackRes;
+        else if (fallbackRes?.data) finalSchedules = fallbackRes.data;
+      }
+
+      setSchedules(finalSchedules);
     } catch (error) {
+      console.error("Fetch schedules error:", error);
       toast.error("Failed to load schedules!");
     } finally {
       setFetching(false);
@@ -49,9 +75,8 @@ export default function ManageSchedulesClient({ doctor }) {
 
   useEffect(() => {
     fetchSchedules();
-  }, [doctorId]);
+  }, [targetDoctorId]);
 
-  // সাবমিট হ্যান্ডলার
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -72,26 +97,22 @@ export default function ManageSchedulesClient({ doctor }) {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/schedules", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          doctorId: doctorId,
-          doctorEmail: doctor?.doctorEmail,
-          date: formData.date,
-          timeSlot: formData.timeSlot,
-          maxPatients: formData.maxPatients,
-        }),
-      });
+      const payload = {
+        doctorId: targetDoctorId,
+        doctorEmail: doctor?.doctorEmail,
+        date: formData.date,
+        timeSlot: formData.timeSlot,
+        maxPatients: Number(formData.maxPatients),
+      };
 
-      const result = await response.json();
+      const result = await createDoctorSchedules(payload);
 
-      if (result.success) {
+      if (result?.success) {
         toast.success("Schedule created successfully!");
         fetchSchedules();
-        setFormData({ ...formData, date: "" });
+        setFormData((prev) => ({ ...prev, date: "" }));
       } else {
-        toast.error(result.message || "Failed to create schedule");
+        toast.error(result?.message || "Failed to create schedule");
       }
     } catch (err) {
       toast.error("Network error! Could not save schedule.");
@@ -104,15 +125,12 @@ export default function ManageSchedulesClient({ doctor }) {
     <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
       <Toaster position="top-right" />
 
-      {/* Top Grid Layout: Left (Doctor Info) & Right (Form) */}
+      {/* Top Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
-        
-        {/* Left: Doctor Info (2 Columns) */}
         <div className="lg:col-span-2">
           <DoctorInfoCard doctor={doctor} totalSlots={schedules.length} />
         </div>
 
-        {/* Right: Add Schedule Form (3 Columns) */}
         <div className="lg:col-span-3">
           <AddScheduleForm
             formData={formData}
@@ -122,7 +140,6 @@ export default function ManageSchedulesClient({ doctor }) {
             submitting={submitting}
           />
         </div>
-
       </div>
 
       {/* Bottom Section: Active Schedules List */}
@@ -135,47 +152,12 @@ export default function ManageSchedulesClient({ doctor }) {
           <div className="p-8 text-center bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-center gap-2 text-slate-400 text-xs font-semibold">
             <Loader2 size={18} className="animate-spin" /> Loading schedules...
           </div>
-        ) : schedules.length === 0 ? (
-          <div className="p-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-slate-400">
-            <AlertCircle size={32} className="mx-auto mb-2 opacity-50" />
-            <p className="text-xs font-semibold">No schedules created yet.</p>
-          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence>
-              {schedules.map((item) => (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-[11px] font-bold text-[#0E7490] bg-cyan-50 border border-cyan-100 px-2.5 py-0.5 rounded-md flex items-center gap-1">
-                        <Calendar size={12} /> {item.date}
-                      </span>
-                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <CheckCircle2 size={10} /> {item.status || "Available"}
-                      </span>
-                    </div>
-
-                    <p className="text-sm font-extrabold text-slate-800 mt-2 flex items-center gap-1.5">
-                      <Clock size={14} className="text-slate-400" />
-                      {item.timeSlot}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-medium">
-                    <span className="flex items-center gap-1">
-                      <Users size={13} className="text-slate-400" /> Capacity: {item.maxPatients}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <ScheduleList
+            schedules={schedules}
+            onRefresh={fetchSchedules}
+            timeSlots={timeSlots}
+          />
         )}
       </div>
     </div>
