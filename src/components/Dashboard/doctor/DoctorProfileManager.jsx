@@ -107,33 +107,40 @@ export default function DoctorProfileManager({ initialProfile = null }) {
     return <NoProfileCard cardRef={cardRef} onCreateClick={() => setIsCreating(true)} />;
   }
 
-  // View 2: Form (Create/Edit)
-  if (isCreating || isEditing) {
-    return (
-      <ProfileForm
-        cardRef={cardRef}
-        formData={formData}
-        saving={saving}
-        isEditing={isEditing}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-        onCancel={() => {
-          setIsCreating(false);
-          setIsEditing(false);
-        }}
-      />
-    );
-  }
-
-  // View 3: Profile Display
   return (
-    <ProfileCard
-      cardRef={cardRef}
-      profile={profile}
-      onEdit={() => {
-        setFormData(profile);
-        setIsEditing(true);
-      }}
-    />
+    <div className="relative w-full h-full">
+      {/* Profile Display or No Profile Display behind the modal */}
+      {!profile ? (
+        <NoProfileCard cardRef={cardRef} onCreateClick={() => setIsCreating(true)} />
+      ) : (
+        <ProfileCard
+          cardRef={cardRef}
+          profile={profile}
+          onEdit={() => {
+            setFormData(profile);
+            setIsEditing(true);
+          }}
+        />
+      )}
+
+      {/* Modal Overlay for Form (Create/Edit) */}
+      {(isCreating || isEditing) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-3xl my-auto" ref={cardRef}>
+            <ProfileForm
+              formData={formData}
+              saving={saving}
+              isEditing={isEditing}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onCancel={() => {
+                setIsCreating(false);
+                setIsEditing(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
