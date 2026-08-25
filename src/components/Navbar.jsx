@@ -15,7 +15,6 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  console.log(user, "Navbar")
 
   const handleSignOut = async () => {
     await authClient.signOut({
