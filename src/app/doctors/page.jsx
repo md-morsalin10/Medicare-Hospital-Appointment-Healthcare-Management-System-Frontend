@@ -5,7 +5,10 @@ const DoctorPage = async () => {
     const doctorsData = await getAllDoctorsProfile();
 
     const verifiedDoctors = Array.isArray(doctorsData) 
-        ? doctorsData.filter(doc => doc.verificationStatus === 'Verified')
+        ? doctorsData.filter((doc, index, self) => 
+            doc.verificationStatus === 'Verified' &&
+            index === self.findIndex((d) => d._id === doc._id)
+          )
         : [];
 
     return (

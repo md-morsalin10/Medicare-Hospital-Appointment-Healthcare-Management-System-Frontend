@@ -29,7 +29,7 @@ export default function ProfileCard({ cardRef, profile, onEdit }) {
         className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/40 relative overflow-hidden"
       >
         {/* Top Banner */}
-        <div className="h-32 sm:h-48 w-full bg-gradient-to-r from-[#0E7490] via-cyan-600 to-teal-500 relative">
+        <div className="h-32 sm:h-48 w-full bg-slate-100 border-b border-slate-200 relative">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           {/* Edit Profile Button */}
           <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
@@ -37,7 +37,7 @@ export default function ProfileCard({ cardRef, profile, onEdit }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onEdit}
-              className="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold text-sm rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-white/30"
+              className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer border border-slate-200"
             >
               <Edit3 size={16} />
               <span className="hidden sm:inline">Edit Profile</span>
@@ -63,7 +63,7 @@ export default function ProfileCard({ cardRef, profile, onEdit }) {
                   />
                 </div>
               ) : (
-                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-gradient-to-tr from-[#0E7490] to-cyan-400 flex items-center justify-center text-white font-bold text-5xl ring-8 ring-white shadow-xl">
+                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-5xl ring-8 ring-white shadow-xl">
                   {data?.doctorName?.[0] || "D"}
                 </div>
               )}
@@ -99,26 +99,26 @@ export default function ProfileCard({ cardRef, profile, onEdit }) {
           {/* Hospital/Affiliation Section */}
           <motion.div 
             whileHover={{ y: -2 }}
-            className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg shadow-slate-900/10 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden"
+            className="mb-8 p-5 rounded-2xl bg-white border border-slate-200 text-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden"
           >
-            <div className="absolute right-0 top-0 bottom-0 w-48 bg-white/5 blur-2xl pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-48 bg-slate-50 blur-2xl pointer-events-none" />
             
             <div className="flex items-center gap-4 relative z-10 w-full sm:w-auto">
-              <div className="p-3.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/10 text-cyan-400">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-slate-500">
                 <Building2 size={24} />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-0.5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-0.5">
                   Current Hospital Affiliation
                 </p>
-                <h3 className="text-lg font-bold text-slate-50 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   {data?.hospitalName || "Not Specified"}
                 </h3>
               </div>
             </div>
 
-            <div className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 text-slate-300 text-sm font-medium bg-white/5 px-4 py-2 rounded-xl border border-white/10 relative z-10">
-              <MapPin size={16} className="text-cyan-400" />
+            <div className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 text-slate-600 text-sm font-medium bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 relative z-10">
+              <MapPin size={16} className="text-slate-500" />
               <span>Primary Location</span>
             </div>
           </motion.div>
