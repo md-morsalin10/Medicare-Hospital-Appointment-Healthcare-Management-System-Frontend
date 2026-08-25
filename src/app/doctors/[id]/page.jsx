@@ -1,9 +1,10 @@
 import { getDoctorsScheduleById } from "@/lib/api/schedules";
 import React from "react";
 import Image from "next/image";
-import DoctorScheduleSection from "@/components/DoctorScheduleSection"; // পাথ অনুযায়ী ইমপোর্ট করুন
+import DoctorScheduleSection from "@/components/DoctorScheduleSection";
+import { getUserSeason } from "@/lib/core/session";
 
-// যদি আপনার কাছে Doctor By ID ফেচ করার API থাকে
+
 async function getDoctorById(id) {
     const res = await fetch(`http://localhost:5000/api/doctors/${id}`, {
         cache: "no-store",
@@ -18,7 +19,10 @@ const DoctorDetailsPage = async ({ params }) => {
     // সমান্তরালে ডাটা ফেচিং
     const doctorData = getDoctorById(id);
     const scheduleData = getDoctorsScheduleById({ doctorId: id });
-
+    const user = await getUserSeason(); 
+    
+    console.log("=== CHECKING USER SESSION DETAILS ===", user)
+    
     const [doctor, doctorSchedule] = await Promise.all([doctorData, scheduleData]);
 
     return (
@@ -86,7 +90,7 @@ const DoctorDetailsPage = async ({ params }) => {
 
                 {/* Right Side: Schedules */}
                 <div className="lg:col-span-4 order-1 lg:order-2">
-                    <DoctorScheduleSection schedules={doctorSchedule || []} doctorFee={doctor?.consultationFee} />
+                    <DoctorScheduleSection user={user} schedules={doctorSchedule || []} doctor={doctor} />
                 </div>
 
             </div>

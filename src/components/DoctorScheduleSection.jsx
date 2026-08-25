@@ -2,14 +2,15 @@
 
 import React, { useState } from "react";
 
-const DoctorScheduleSection = ({ schedules = [], doctorFee = 0 }) => {
+const DoctorScheduleSection = ({ schedules = [], doctor, user }) => {
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
     const [symptoms, setSymptoms] = useState("");
 
+
     // Extract unique dates from schedules
     const availableDates = [...new Set(schedules.map(s => s.date))];
-    
+
     // Extract available times for selected date
     const availableTimesForDate = schedules.filter(s => s.date === selectedDate).map(s => ({
         id: s._id,
@@ -23,7 +24,7 @@ const DoctorScheduleSection = ({ schedules = [], doctorFee = 0 }) => {
     const handleBooking = (e) => {
         e.preventDefault();
         if (!selectedDate || !selectedTime) return;
-        
+
         const scheduleDetails = availableTimesForDate.find(t => t.time === selectedTime);
         if (!scheduleDetails) return;
 
@@ -36,7 +37,7 @@ const DoctorScheduleSection = ({ schedules = [], doctorFee = 0 }) => {
             status: "Pending",
             createdAt: new Date().toISOString()
         };
-        
+
         console.log("Dummy Booking created:", dummyBooking);
         alert("Booking selected! (Dummy data created)");
     };
@@ -131,13 +132,33 @@ const DoctorScheduleSection = ({ schedules = [], doctorFee = 0 }) => {
                 </div>
 
                 {/* Book Appointment Button */}
-                <button
-                    type="submit"
-                    disabled={!selectedDate || !selectedTime}
-                    className="w-full py-3.5 px-4 bg-[#2f614a] hover:bg-[#254f3b] text-white rounded-xl font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm mt-2"
-                >
-                    Book Appointment (${doctorFee})
-                </button>
+                {/* Book Appointment Form */}
+                <form action="/api/payment" method="POST">
+                    {/* Doctor Info */}
+                    <input type="hidden" name="doctorId" value={doctor?._id} />
+                    <input type="hidden" name="doctorName" value={doctor?.doctorName} />
+                    <input type="hidden" name="doctorEmail" value={doctor?.doctorEmail || doctor?.email} />
+                    <input type="hidden" name="doctorFee" value={doctor?.consultationFee} />
+
+                    {/* Patient Info */}
+                    <input type="hidden" name="patientId" value={user?._id || user?.id} />
+                    <input type="hidden" name="patientName" value={user?.name} />
+                    <input type="hidden" name="patientEmail" value={user?.email} />
+                    <input type="hidden" name="patientImage" value={user?.image} />
+
+                    {/* Schedule & Symptoms Info (খুবই গুরুত্বপূর্ণ) */}
+                    <input type="hidden" name="appointmentDate" value={selectedDate} />
+                    <input type="hidden" name="appointmentTime" value={selectedTime} />
+                    <input type="hidden" name="symptoms" value={symptoms} />
+
+                    <button
+                        type="submit"
+                        disabled={!selectedDate || !selectedTime}
+                        className="w-full py-3.5 px-4 bg-[#2f614a] hover:bg-[#254f3b] text-white rounded-xl font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm mt-2"
+                    >
+                        Book Appointment (${doctor?.consultationFee})
+                    </button>
+                </form>
             </form>
         </div>
     );
