@@ -13,11 +13,13 @@ import {
     AlertCircle,
     FileText
 } from "lucide-react";
+import PrescriptionModal from "./PrescriptionModal";
 
 const DoctorAppointmentCard = ({ appointment, onStatusChange }) => {
     const router = useRouter();
     const [status, setStatus] = useState(appointment.status || "Pending"); // Pending, Confirmed, Cancelled, Completed
     const [isRejectOpen, setIsRejectOpen] = useState(false);
+    const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
 
     // Status Accept handler
     const handleAccept = () => {
@@ -32,12 +34,14 @@ const DoctorAppointmentCard = ({ appointment, onStatusChange }) => {
         setIsRejectOpen(false);
     };
 
-    // Mark Completed and navigate to Prescription route
+    // Mark Completed and show Prescription Modal
     const handleAddPrescription = () => {
-        // Navigate to prescription page with patient and appointment info query params
-        router.push(
-            `/dashboard/doctor/prescriptions/create?appointmentId=${appointment._id}&patientId=${appointment.patientId}&patientName=${encodeURIComponent(appointment.patientName)}`
-        );
+        setIsPrescriptionModalOpen(true);
+    };
+
+    const handlePrescriptionCompleted = (appointmentId) => {
+        setStatus("Completed");
+        if (onStatusChange) onStatusChange(appointmentId, "Completed");
     };
 
     return (
@@ -186,6 +190,15 @@ const DoctorAppointmentCard = ({ appointment, onStatusChange }) => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* PRESCRIPTION MODAL */}
+            {isPrescriptionModalOpen && (
+                <PrescriptionModal
+                    appointment={appointment}
+                    onClose={() => setIsPrescriptionModalOpen(false)}
+                    onCompleted={handlePrescriptionCompleted}
+                />
+            )}
         </>
     );
 };
