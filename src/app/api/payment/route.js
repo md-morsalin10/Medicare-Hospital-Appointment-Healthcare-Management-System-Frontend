@@ -57,7 +57,6 @@ export async function POST(request) {
                 patientEmail,
                 patientImage,
 
-                // Booking Specific Details
                 appointmentDate,
                 appointmentTime,
                 symptoms: symptoms || "N/A",

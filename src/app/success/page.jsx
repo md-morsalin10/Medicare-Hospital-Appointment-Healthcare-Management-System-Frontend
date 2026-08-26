@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle2, Calendar, Clock, User, FileText, ArrowRight } from 'lucide-react';
 import { stripe } from '@/lib/stripe';
+import { createBookingData } from '@/lib/action/doctorBooking';
 
 
 export default async function Success({ searchParams }) {
@@ -24,6 +25,13 @@ export default async function Success({ searchParams }) {
   }
 
   if (status === 'complete') {
+
+    await createBookingData({
+      ...metadata,
+      stripeSessionId: session_id,
+      paymentStatus: status,
+      customerEmail: customerEmail,
+    })
     
     console.log('=== Stripe Session Metadata ===', metadata);
 
