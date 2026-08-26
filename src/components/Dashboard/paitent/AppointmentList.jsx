@@ -5,22 +5,56 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CalendarX } from "lucide-react";
 import AppointmentCard from "./AppointmentCard";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
+
 const AppointmentList = ({ initialBookings = [] }) => {
     const [bookings, setBookings] = useState(initialBookings);
 
-    // Handle Cancel Action
+    // Handle Cancel — mark as Cancelled in DB and UI
     const handleCancel = async (id) => {
-        // Optimistic UI Update
-        setBookings((prev) => prev.filter((item) => item._id !== id));
+        setBookings((prev) =>
+            prev.map((item) =>
+                item._id === id ? { ...item, status: "Cancelled" } : item
+            )
+        );
 
-        // TODO: Call your Backend API to Delete/Cancel from DB
-        // await fetch(`/api/schedules/cancel/${id}`, { method: 'DELETE' });
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "Cancelled" })
+            });
+            const data = await res.json();
+            if (!data.success) console.error("Cancel failed:", data.message);
+        } catch (err) {
+            console.error("Cancel error:", err);
+        }
     };
 
-    // Handle Reschedule Action
-    const handleReschedule = (appointment) => {
-        // Navigate or trigger reschedule flow
-        alert(`Reschedule feature triggered for ${appointment.doctorName}`);
+    // Handle Delete — permanently remove from DB and UI
+    const handleDelete = async (id) => {
+        setBookings((prev) => prev.filter((item) => item._id !== id));
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (!data.success) console.error("Delete failed:", data.message);
+        } catch (err) {
+            console.error("Delete error:", err);
+        }
+    };
+
+    // Handle Reschedule — update date/time in UI state (API call done inside AppointmentCard)
+    const handleReschedule = (id, newDate, newTime) => {
+        setBookings((prev) =>
+            prev.map((item) =>
+                item._id === id
+                    ? { ...item, appointmentDate: newDate, appointmentTime: newTime }
+                    : item
+            )
+        );
     };
 
     if (!bookings || bookings.length === 0) {
@@ -36,16 +70,14 @@ const AppointmentList = ({ initialBookings = [] }) => {
     }
 
     return (
-        <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
                 {bookings.map((item) => (
                     <AppointmentCard
                         key={item._id}
                         appointment={item}
                         onCancel={handleCancel}
+                        onDelete={handleDelete}
                         onReschedule={handleReschedule}
                     />
                 ))}
