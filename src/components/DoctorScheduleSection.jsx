@@ -139,6 +139,7 @@ const DoctorScheduleSection = ({ schedules = [], doctor, user }) => {
                     <input type="hidden" name="doctorName" value={doctor?.doctorName} />
                     <input type="hidden" name="doctorEmail" value={doctor?.doctorEmail || doctor?.email} />
                     <input type="hidden" name="doctorFee" value={doctor?.consultationFee} />
+                    <input type="hidden" name="doctorImage" value={doctor?.profileImage} />
 
                     {/* Patient Info */}
                     <input type="hidden" name="patientId" value={user?._id || user?.id} />

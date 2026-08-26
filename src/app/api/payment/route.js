@@ -16,6 +16,7 @@ export async function POST(request) {
         const doctorName = formData.get("doctorName");
         const doctorEmail = formData.get("doctorEmail");
         const doctorFee = formData.get("doctorFee");
+        const doctorImage = formData.get("doctorImage");
 
         // Extracting Patient Info
         const patientId = formData.get("patientId") || user?._id || user?.id;
@@ -50,6 +51,8 @@ export async function POST(request) {
                 doctorName,
                 doctorEmail,
                 doctorFee: String(doctorFee), 
+                doctorImage,
+
 
                 // Patient Details
                 patientId,
