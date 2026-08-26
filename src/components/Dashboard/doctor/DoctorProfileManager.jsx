@@ -9,7 +9,6 @@ import ProfileCard from "./ProfileCard";
 import { authClient } from "@/lib/auth-client";
 
 export default function DoctorProfileManager({ initialProfile = null }) {
-  // যদি initialProfile খালি Array হয় ([]) বা falsy হয়, তবে null বানিয়ে নেওয়া হচ্ছে
   const rawProfile = Array.isArray(initialProfile)
     ? initialProfile.length > 0 ? initialProfile[0] : null
     : initialProfile;

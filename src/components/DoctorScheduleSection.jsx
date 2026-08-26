@@ -135,7 +135,7 @@ const DoctorScheduleSection = ({ schedules = [], doctor, user }) => {
                 {/* Book Appointment Form */}
                 <form action="/api/payment" method="POST">
                     {/* Doctor Info */}
-                    <input type="hidden" name="doctorId" value={doctor?._id} />
+                    <input type="hidden" name="doctorId" value={doctor?.doctorId} />
                     <input type="hidden" name="doctorName" value={doctor?.doctorName} />
                     <input type="hidden" name="doctorEmail" value={doctor?.doctorEmail || doctor?.email} />
                     <input type="hidden" name="doctorFee" value={doctor?.consultationFee} />
