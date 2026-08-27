@@ -45,7 +45,7 @@ const partnerHospitals = [
   'Labaid Cancer Hospital',
   'United Hospital',
   'Ibn Sina Medical',
-  'Populat Diagnostic',
+  'Popular Diagnostic',
 ];
 
 const PlatformStats = () => {

@@ -11,7 +11,11 @@ import {
   TrendingUp, 
   UserCheck, 
   CalendarCheck, 
-  Sparkles 
+  Sparkles,
+  Search,
+  Heart,
+  Stethoscope,
+  MapPin
 } from 'lucide-react';
 
 // Swiper CSS
@@ -78,6 +82,17 @@ const Banner = () => {
       {/* Background Soft Glow Effects */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#0E7490]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#10B981]/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Floating decorative medical icons */}
+      <div className="absolute top-12 right-[10%] opacity-10 animate-pulse pointer-events-none hidden lg:block">
+        <Heart className="w-10 h-10 text-[#0E7490]" />
+      </div>
+      <div className="absolute bottom-20 left-[6%] opacity-8 pointer-events-none hidden lg:block" style={{animation: 'pulse 3s ease-in-out 1s infinite'}}>
+        <Stethoscope className="w-12 h-12 text-[#10B981]" />
+      </div>
+      <div className="absolute top-1/2 right-[4%] opacity-5 pointer-events-none hidden xl:block">
+        <div className="w-24 h-24 rounded-full border-4 border-[#0E7490]" />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Swiper
@@ -167,6 +182,46 @@ const Banner = () => {
                               Book Appointment
                               <Calendar className="w-4 h-4" />
                             </Link>
+                          </motion.div>
+
+                          {/* Quick Search Bar */}
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.55 }}
+                            className="w-full max-w-xl"
+                          >
+                            <form
+                              onSubmit={(e) => e.preventDefault()}
+                              className="flex items-center bg-white/90 backdrop-blur-md rounded-2xl border border-[#0E7490]/20 shadow-lg shadow-[#0E7490]/10 overflow-hidden p-1.5 gap-2"
+                            >
+                              <div className="flex items-center gap-2 flex-1 px-3">
+                                <Search className="w-4 h-4 text-[#0E7490] flex-shrink-0" />
+                                <input
+                                  type="text"
+                                  placeholder="Search by specialty, doctor name..."
+                                  className="flex-1 text-sm text-[#0F172A] placeholder-gray-400 bg-transparent focus:outline-none py-1.5 font-medium"
+                                />
+                              </div>
+                              <div className="hidden sm:flex items-center gap-1.5 px-3 border-l border-gray-200">
+                                <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                <input
+                                  type="text"
+                                  placeholder="Location"
+                                  className="w-24 text-sm text-[#0F172A] placeholder-gray-400 bg-transparent focus:outline-none py-1.5 font-medium"
+                                />
+                              </div>
+                              <button
+                                type="submit"
+                                className="flex-shrink-0 px-5 py-2.5 rounded-xl bg-[#0E7490] text-white text-sm font-semibold hover:bg-[#085369] transition-colors duration-200 flex items-center gap-1.5 shadow-md shadow-[#0E7490]/20"
+                              >
+                                <Search className="w-3.5 h-3.5" />
+                                Search
+                              </button>
+                            </form>
+                            <p className="text-xs text-gray-400 mt-2 ml-1 font-medium">
+                              🔥 Popular: <span className="text-[#0E7490] cursor-pointer hover:underline">Cardiology</span> · <span className="text-[#0E7490] cursor-pointer hover:underline">Neurology</span> · <span className="text-[#0E7490] cursor-pointer hover:underline">Pediatrics</span>
+                            </p>
                           </motion.div>
                         </motion.div>
                       )}
