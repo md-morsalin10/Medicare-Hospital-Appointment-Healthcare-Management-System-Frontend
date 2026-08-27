@@ -21,6 +21,12 @@ export const auth = betterAuth({
                 defaultValue: "patient",
                 input: true, 
             },
+            isSuspended: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
+                input: false
+            }
         },
     },
 });
