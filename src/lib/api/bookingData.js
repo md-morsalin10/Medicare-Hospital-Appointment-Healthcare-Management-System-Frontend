@@ -7,3 +7,7 @@ export const getBookingDataByPatientId = async ({ patientId }) => {
 export const getBookingDataByDoctorId = async ({ doctorId }) => {
     return await serverFetch(`/api/bookings?doctorId=${doctorId}`)
 }
+export const getBookingData = async () => {
+    return await serverFetch(`/api/bookings`)
+}
+

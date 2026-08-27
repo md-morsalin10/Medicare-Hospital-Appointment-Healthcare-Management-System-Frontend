@@ -50,7 +50,7 @@ const adminNavItems = [
   { icon: LayoutDashboard, href: "/dashboard/admin", label: "Overview" },
   { icon: Users, href: "/dashboard/admin/manage-users", label: "Manage Users" },
   { icon: UserCheck, href: "/dashboard/admin/manage-doctor", label: "Manage Doctors" },
-  { icon: FileText, href: "/dashboard/admin/appointments", label: "All Appointments" },
+  { icon: FileText, href: "/dashboard/admin/manage-appointments", label: "All Appointments" },
   { icon: CreditCard, href: "/dashboard/admin/transactions", label: "Transactions" },
   { icon: BarChart2, href: "/dashboard/admin/analytics", label: "Analytics" },
 ];
