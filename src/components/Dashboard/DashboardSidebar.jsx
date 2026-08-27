@@ -34,6 +34,7 @@ const doctorNavItems = [
   { icon: Clock, href: "/dashboard/doctor/schedules", label: "Manage Schedule" },
   { icon: FilePlus, href: "/dashboard/doctor/prescriptions", label: "Prescriptions" },
   { icon: Settings, href: "/dashboard/doctor/profile", label: "Profile Settings" },
+  { icon: Star, href: "/dashboard/doctor/reviews", label: "Patient Reviews" },
 ];
 
 const patientNavItems = [

@@ -11,20 +11,22 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { Users, Calendar, Star, TrendingUp, Activity } from 'lucide-react';
+import { Users, Calendar, Star, Activity, DollarSign, CreditCard } from 'lucide-react';
 
-const StatCard = ({ title, value, icon: Icon, delay }) => {
+const StatCard = ({ title, value, icon: Icon, delay, isCurrency = false }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
-      className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow"
+      className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
     >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+          <h3 className="text-3xl font-bold text-gray-900">
+            {isCurrency && '$'}{value}
+          </h3>
         </div>
         <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
           <Icon className="w-7 h-7" />
@@ -38,28 +40,29 @@ export default function DoctorDashboardClient({
   doctorData,
   schedulesData,
   reviewsData,
-  prescriptionsData
+  prescriptionsData,
+  bookingData
 }) {
   const safeSchedules = Array.isArray(schedulesData) ? schedulesData : [];
   const safeReviews = Array.isArray(reviewsData) ? reviewsData : [];
   const safePrescriptions = Array.isArray(prescriptionsData) ? prescriptionsData : [];
+  const safeBookings = Array.isArray(bookingData) ? bookingData : [];
 
-  // Get total unique patients from prescriptions
+  // Get total unique patients from bookings
   const totalPatients = useMemo(() => {
     const patientIds = new Set();
-    safePrescriptions.forEach(p => {
-      if (p.patientId) patientIds.add(p.patientId);
+    safeBookings.forEach(b => {
+      if (b.patientId) patientIds.add(b.patientId);
     });
     return patientIds.size;
-  }, [safePrescriptions]);
+  }, [safeBookings]);
 
-  // Today's appointments (using prescriptions as proxy for completed appointments or schedules for available ones)
+  // Today's appointments (using bookings)
   const todayAppointments = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
-    // Check schedules available today or prescriptions created today
-    const todayPrescriptions = safePrescriptions.filter(p => p.appointmentDate === today).length;
-    return todayPrescriptions; // Or however you define a today's appointment from your dynamic data
-  }, [safePrescriptions]);
+    const todayBookings = safeBookings.filter(b => b.appointmentDate === today).length;
+    return todayBookings;
+  }, [safeBookings]);
 
   // Average Rating
   const averageRating = useMemo(() => {
@@ -68,7 +71,14 @@ export default function DoctorDashboardClient({
     return (sum / safeReviews.length).toFixed(1);
   }, [safeReviews]);
 
-  // Chart Data: Patients per day based on prescriptions/appointments
+  // Total Earnings from Paid Bookings
+  const totalEarnings = useMemo(() => {
+    return safeBookings
+      .filter(b => b.paymentStatus === 'Paid')
+      .reduce((acc, b) => acc + (b.doctorFee || 0), 0);
+  }, [safeBookings]);
+
+  // Chart Data: Patients per day based on bookings
   const chartData = useMemo(() => {
     const dateCounts = {};
     
@@ -83,9 +93,9 @@ export default function DoctorDashboardClient({
       dateCounts[dateString] = 0;
     }
 
-    safePrescriptions.forEach(p => {
-      if (p.appointmentDate && dateCounts[p.appointmentDate] !== undefined) {
-        dateCounts[p.appointmentDate]++;
+    safeBookings.forEach(b => {
+      if (b.appointmentDate && dateCounts[b.appointmentDate] !== undefined) {
+        dateCounts[b.appointmentDate]++;
       }
     });
 
@@ -93,7 +103,7 @@ export default function DoctorDashboardClient({
       name: day.name,
       patients: dateCounts[day.date]
     }));
-  }, [safePrescriptions]);
+  }, [safeBookings]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
@@ -114,21 +124,22 @@ export default function DoctorDashboardClient({
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard 
+          title="Total Earnings" 
+          value={totalEarnings} 
+          icon={DollarSign} 
+          delay={0.1} 
+          isCurrency={true}
+        />
+        <StatCard 
           title="Total Patients" 
           value={totalPatients} 
           icon={Users} 
-          delay={0.1} 
+          delay={0.2} 
         />
         <StatCard 
           title="Today's Activity" 
           value={todayAppointments} 
           icon={Calendar} 
-          delay={0.2} 
-        />
-        <StatCard 
-          title="Reviews Received" 
-          value={safeReviews.length} 
-          icon={Star} 
           delay={0.3} 
         />
         <StatCard 
@@ -170,7 +181,7 @@ export default function DoctorDashboardClient({
           </div>
         </motion.div>
 
-        {/* Recent Reviews Section */}
+        {/* Recent Transactions / Bookings Section */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -178,45 +189,37 @@ export default function DoctorDashboardClient({
           className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col max-h-[440px]"
         >
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-gray-900">Recent Reviews</h3>
+            <h3 className="text-lg font-bold text-gray-900">Recent Payments</h3>
           </div>
           
           <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-            {safeReviews.length > 0 ? (
-              safeReviews.slice().reverse().map((review, i) => (
+            {safeBookings.length > 0 ? (
+              safeBookings.filter(b => b.paymentStatus === 'Paid').slice().reverse().map((booking, i) => (
                 <motion.div 
-                  key={review._id || i}
+                  key={booking._id || i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + (i * 0.1) }}
-                  className="p-4 rounded-2xl bg-gray-50 border border-gray-100"
+                  className="p-4 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between"
                 >
-                  <div className="flex items-center gap-3 mb-2">
-                    <img 
-                      src={review.patientImage || 'https://cdn-icons-png.flaticon.com/512/9193/9193824.png'} 
-                      alt={review.patientName || 'Patient'}
-                      className="w-10 h-10 rounded-full border border-gray-200 object-cover"
-                    />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <CreditCard className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900">{review.patientName || 'Anonymous'}</h4>
-                      <div className="flex gap-1 mt-1">
-                        {[...Array(5)].map((_, idx) => (
-                          <Star 
-                            key={idx} 
-                            className={`w-3 h-3 ${idx < (review.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} 
-                          />
-                        ))}
-                      </div>
+                      <h4 className="text-sm font-semibold text-gray-900">{booking.patientName || 'Patient'}</h4>
+                      <p className="text-xs text-gray-500">{booking.appointmentDate} | {booking.appointmentTime}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    "{review.reviewText}"
-                  </p>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-gray-900">+${booking.doctorFee || 0}</p>
+                    <p className="text-xs text-emerald-500 font-medium">Paid</p>
+                  </div>
                 </motion.div>
               ))
             ) : (
               <div className="text-center text-gray-400 py-10">
-                No reviews received yet.
+                No payment data received yet.
               </div>
             )}
           </div>

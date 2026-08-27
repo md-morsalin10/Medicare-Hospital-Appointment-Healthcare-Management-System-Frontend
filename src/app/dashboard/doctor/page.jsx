@@ -5,6 +5,7 @@ import { getReviewsByDoctorId } from '@/lib/api/reviews';
 import { getUserSeason } from '@/lib/core/session';
 import React from 'react';
 import DoctorDashboardClient from './components/DoctorDashboardClient';
+import { getBookingDataByDoctorId } from '@/lib/api/bookingData';
 
 const DoctorPage = async () => {
     const user = await getUserSeason();
@@ -14,6 +15,7 @@ const DoctorPage = async () => {
     const schedulesData = await getDoctorsScheduleById({ doctorId });
     const reviewsData = await getReviewsByDoctorId({ doctorId: user?.id });
     const prescriptionsData = await getPrescriptionsByDoctorId({ doctorId: user?.id });
+    const bookingData = await getBookingDataByDoctorId({ doctorId: user?.id });
 
     return (
         <DoctorDashboardClient 
@@ -21,6 +23,7 @@ const DoctorPage = async () => {
             schedulesData={schedulesData}
             reviewsData={reviewsData}
             prescriptionsData={prescriptionsData}
+            bookingData={bookingData}
         />
     );
 };

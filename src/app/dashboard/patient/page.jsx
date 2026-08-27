@@ -5,8 +5,10 @@ import React from 'react';
 const PatientPage = async () => {
     const user = await getUserSeason();
     const reviewsData = await getReviewsByPatientId({ patientId: user?.id });
-
     console.log('Reviews Data:', reviewsData);
+    
+
+
     return (
         <div>
 
