@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, MessageSquare, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { createReview } from "@/lib/action/review";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
 const ReviewModal = ({ prescription, onClose }) => {
     const { data: session } = authClient.useSession();
@@ -39,15 +39,8 @@ const ReviewModal = ({ prescription, onClose }) => {
 
         try {
 
-            
-            const res = await fetch(`${BACKEND_URL}/api/reviews`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await res.json();
-
+            const data = await createReview(payload);
+        
             if (!data.success) {
                 setError(data.message || "Failed to submit review.");
                 return;
