@@ -38,6 +38,8 @@ const ReviewModal = ({ prescription, onClose }) => {
         };
 
         try {
+
+            
             const res = await fetch(`${BACKEND_URL}/api/reviews`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

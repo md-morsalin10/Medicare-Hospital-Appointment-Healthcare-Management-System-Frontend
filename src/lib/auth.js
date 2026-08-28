@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
@@ -19,7 +20,7 @@ export const auth = betterAuth({
                 type: "string",
                 required: false,
                 defaultValue: "patient",
-                input: true, 
+                input: true,
             },
             isSuspended: {
                 type: "boolean",
@@ -29,4 +30,15 @@ export const auth = betterAuth({
             }
         },
     },
+    session: {
+        cookieCache: {
+            enabled: true,
+            strategy: "jwt",
+            maxAge: 60 * 60 * 24 * 7, // 7 days, in seconds
+        }
+    },
+
+    plugins: [
+        jwt()
+    ]
 });

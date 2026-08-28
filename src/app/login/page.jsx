@@ -33,8 +33,6 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // TODO: Connect Firebase / Better-Auth / Backend API Login logic here
-      console.log('Login Credentials:', formData);
       const { data, error } = await authClient.signIn.email({
         email: formData.email, 
         password: formData.password, 
@@ -42,11 +40,15 @@ const LoginPage = () => {
         callbackURL: "/",
       });
 
-      // Simulation of successful login
-      setTimeout(() => {
-        toast.success('Welcome back to MediCare Connect!');
+      if (error) {
+        toast.error(error?.message || 'Invalid credentials! Please try again.');
         setLoading(false);
-      }, 1200);
+        return;
+      }
+
+      toast.success('Welcome back to MediCare Connect!');
+      // better-auth redirect handles navigating to callbackURL
+      setLoading(false);
 
     } catch (error) {
       toast.error(error?.message || 'Invalid credentials! Please try again.');
@@ -203,7 +205,7 @@ const LoginPage = () => {
 
         {/* Register Redirect Link */}
         <p className="text-center text-sm text-gray-600 mt-6">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="font-bold text-[#0E7490] hover:underline">
             Register Now
           </Link>

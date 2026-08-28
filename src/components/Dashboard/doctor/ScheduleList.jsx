@@ -72,6 +72,7 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
 
   // Delete
   const handleDelete = async (id) => {
+    const baseUrl = process.env.NEXT_PUBLIC_URL;
     toast((t) => (
       <div className="flex flex-col gap-3">
         <p className="text-sm font-semibold text-slate-800">
