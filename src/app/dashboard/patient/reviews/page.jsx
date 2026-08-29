@@ -17,7 +17,7 @@ const PatientPage = async () => {
                         My Reviews
                     </h1>
                     <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                        View and manage the feedback you've given to doctors.
+                        View and manage the feedback you have given to doctors.
                     </p>
                 </div>
 

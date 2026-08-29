@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2, XCircle, Clock, Search, ShieldAlert, Loader2 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 export default function ManageDoctorsClient({ initialDoctors = [] }) {
   const [doctors, setDoctors] = useState(initialDoctors);
@@ -15,9 +16,13 @@ export default function ManageDoctorsClient({ initialDoctors = [] }) {
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_URL;
+      const token = await getClientToken()
       const res = await fetch(`${baseUrl}/api/doctors/verify/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ verificationStatus: newStatus }),
       });
 

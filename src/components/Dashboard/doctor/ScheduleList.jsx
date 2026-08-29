@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 
 export default function ScheduleList({ schedules = [], onRefresh, timeSlots = [] }) {
@@ -25,13 +26,13 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
   const [deletingId, setDeletingId] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  // Edit Modal ওপেন
+  // Edit Modal 
   const handleEditClick = (item) => {
     setSelectedSchedule({ ...item });
     setIsOpen(true);
   };
 
-  // Modal বন্ধ
+
   const handleCloseModal = () => {
     setIsOpen(false);
     setSelectedSchedule(null);
@@ -43,10 +44,15 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
     setUpdating(true);
 
     try {
+      const token = await getClientToken()
       const baseUrl = process.env.NEXT_PUBLIC_URL;
       const res = await fetch(`${baseUrl}/api/schedules/${selectedSchedule._id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": `Bearer ${token}`
+
+        },
         body: JSON.stringify({
           date: selectedSchedule.date,
           timeSlot: selectedSchedule.timeSlot,
@@ -73,6 +79,7 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
   // Delete
   const handleDelete = async (id) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL;
+    const token = await getClientToken()
     toast((t) => (
       <div className="flex flex-col gap-3">
         <p className="text-sm font-semibold text-slate-800">
@@ -92,6 +99,10 @@ export default function ScheduleList({ schedules = [], onRefresh, timeSlots = []
               try {
                 const res = await fetch(`${baseUrl}/api/schedules/${id}`, {
                   method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                  }
                 });
                 const data = await res.json();
                 if (data?.success || res.ok) {

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquareOff, X, Loader2, Star } from "lucide-react";
 import ReviewCard from "./ReviewCard";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
@@ -25,8 +26,13 @@ const ReviewListClient = ({ initialReviews = [] }) => {
         setReviews((prev) => prev.filter((r) => r._id !== id));
 
         try {
+            const token = await getClientToken()
             const res = await fetch(`${BACKEND_URL}/api/reviews/${id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+
+                    "authorization": `Bearer ${token}`
+                }
             });
             const data = await res.json();
             if (!data.success) {
@@ -50,7 +56,7 @@ const ReviewListClient = ({ initialReviews = [] }) => {
     // EDIT handler
     const handleEditSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (editRating === 0) {
             setEditError("Please select a rating.");
             return;
@@ -60,9 +66,13 @@ const ReviewListClient = ({ initialReviews = [] }) => {
         setEditError("");
 
         try {
+            const token = await getClientToken()
             const res = await fetch(`${BACKEND_URL}/api/reviews/${editingReview._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     rating: editRating,
                     reviewText: editReviewText
@@ -159,11 +169,10 @@ const ReviewListClient = ({ initialReviews = [] }) => {
                                                     className="focus:outline-none transition-transform hover:scale-110"
                                                 >
                                                     <Star
-                                                        className={`w-8 h-8 transition-colors ${
-                                                            star <= (editHoverRating || editRating)
-                                                                ? "fill-amber-400 text-amber-400"
-                                                                : "fill-slate-100 text-slate-200 hover:fill-amber-200"
-                                                        }`}
+                                                        className={`w-8 h-8 transition-colors ${star <= (editHoverRating || editRating)
+                                                            ? "fill-amber-400 text-amber-400"
+                                                            : "fill-slate-100 text-slate-200 hover:fill-amber-200"
+                                                            }`}
                                                     />
                                                 </button>
                                             ))}

@@ -16,6 +16,7 @@ import {
     Filter
 } from "lucide-react";
 import Image from "next/image";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 const AppointmentManagementTable = ({ initialAppointments = [] }) => {
     const [appointments, setAppointments] = useState(initialAppointments);
@@ -30,9 +31,14 @@ const AppointmentManagementTable = ({ initialAppointments = [] }) => {
         );
 
         try {
-            const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+            const token = await getClientToken()
+            const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:5000"
+            const res = await fetch(`${baseUrl}/api/bookings/${id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: newStatus }),
             });
 
@@ -80,8 +86,8 @@ const AppointmentManagementTable = ({ initialAppointments = [] }) => {
                             key={tab}
                             onClick={() => setFilter(tab)}
                             className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${filter === tab
-                                    ? "bg-slate-900 text-white shadow-sm"
-                                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                                ? "bg-slate-900 text-white shadow-sm"
+                                : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
                                 }`}
                         >
                             {tab}
