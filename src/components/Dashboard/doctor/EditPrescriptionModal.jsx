@@ -14,6 +14,8 @@ import {
     Loader2,
     AlertCircle
 } from "lucide-react";
+import { getClientToken } from "@/lib/core/tokenClinet";
+
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
@@ -60,9 +62,13 @@ const EditPrescriptionModal = ({ prescription, onClose, onUpdated }) => {
         };
 
         try {
+            const token = await getClientToken()
             const res = await fetch(`${BACKEND_URL}/api/prescriptions/${prescription._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 

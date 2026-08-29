@@ -39,3 +39,12 @@ export const clientMutation = async (path, data, method = "POST") => {
 
     return res.json();
 };
+
+// export const clientPatch = async (path, data) => {
+//     const res = await fetch(`${baseUrl}${path}`, {
+//         method: "PATCH",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data)
+//     });
+//     return res.json();
+// }

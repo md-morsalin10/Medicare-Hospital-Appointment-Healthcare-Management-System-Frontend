@@ -6,9 +6,9 @@ import React from 'react';
 
 const AppointmentPage = async () => {
     const user = await getUserSeason();
-    console.log("User Data:", user?.id);
+    // console.log("User Data:", user?.id);
     const bookingData = await getBookingDataByDoctorId({ doctorId: user?.id });
-    console.log("Booking Data:", bookingData);
+    // console.log("Booking Data:", bookingData);
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-4 sm:p-8">

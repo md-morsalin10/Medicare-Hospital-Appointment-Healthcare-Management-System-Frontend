@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarX } from "lucide-react";
 import DoctorAppointmentCard from "./DoctorAppointmentCard";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 const DoctorAppointmentList = ({ initialBookings = [] }) => {
     const [bookings, setBookings] = useState(initialBookings);
@@ -15,11 +16,13 @@ const DoctorAppointmentList = ({ initialBookings = [] }) => {
         );
 
         try {
+            const token = await getClientToken();
             const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
             const res = await fetch(`${baseUrl}/api/bookings/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ status: newStatus }),
             });

@@ -16,6 +16,7 @@ import {
     AlertCircle,
     CalendarX2
 } from "lucide-react";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
@@ -108,9 +109,13 @@ const AppointmentCard = ({ appointment, onCancel, onDelete, onReschedule }) => {
         setRescheduleLoading(true);
 
         try {
+            const token = await getClientToken();
             const res = await fetch(`${BACKEND_URL}/api/bookings/${appointment._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     appointmentDate: selectedDate,
                     appointmentTime: selectedSlot

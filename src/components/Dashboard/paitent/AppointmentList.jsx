@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarX } from "lucide-react";
 import AppointmentCard from "./AppointmentCard";
+import { getClientToken } from "@/lib/core/tokenClinet";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
@@ -19,9 +20,13 @@ const AppointmentList = ({ initialBookings = [] }) => {
         );
 
         try {
+            const token = await getClientToken();
             const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: "Cancelled" })
             });
             const data = await res.json();
@@ -35,9 +40,14 @@ const AppointmentList = ({ initialBookings = [] }) => {
     const handleDelete = async (id) => {
         setBookings((prev) => prev.filter((item) => item._id !== id));
 
+
         try {
+            const token = await getClientToken();
             const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
                 method: "DELETE",
+                headers: {
+                    "authorization": `Bearer ${token}`
+                }
             });
             const data = await res.json();
             if (!data.success) console.error("Delete failed:", data.message);
