@@ -4,7 +4,7 @@ const baseUrl = process.env.NEXT_PUBLIC_URL;
 
 export const serverFetch = async (path) => {
     const token = await getTokenServer();
-    console.log(token, "from token server fetch")
+    // console.log(token, "from token server fetch")
     const res = await fetch(`${baseUrl}${path}`, {
         headers: {
             "authorization": `Bearer ${token}`
