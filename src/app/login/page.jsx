@@ -34,8 +34,8 @@ const LoginPage = () => {
 
     try {
       const { data, error } = await authClient.signIn.email({
-        email: formData.email, 
-        password: formData.password, 
+        email: formData.email,
+        password: formData.password,
         rememberMe: true,
         callbackURL: "/",
       });
@@ -56,18 +56,17 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    toast.promise(
-      // TODO: Connect Firebase/Auth Google Sign-In function here
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-      {
-        loading: 'Signing in with Google...',
-        success: 'Google sign-in successful!',
-        error: 'Google sign-in failed!',
-      }
-    );
-  };
-
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (err) {
+      toast.error("Google Sign-In failed. Please try again.");
+      console.error(err);
+    }
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#EEF8FC] via-[#F4F9FD] to-[#EBF5FA] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
       <Toaster position="top-right" />

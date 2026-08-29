@@ -27,13 +27,14 @@ const PatientProfile = async () => {
 
             {/* Main Content Card */}
             <div className="relative bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xl shadow-slate-200/50 -mt-20 mx-3 sm:mx-6">
-                
+
                 {/* Profile Top Section: Avatar & Action */}
                 <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 -mt-16 sm:-mt-20 mb-6">
                     <div className="relative">
                         <img
                             src={image}
                             alt={name}
+                            referrerPolicy="no-referrer"
                             className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl object-cover ring-4 ring-white shadow-md bg-white"
                         />
                         <span className="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full" />

@@ -16,29 +16,29 @@ import {
 
 // Maps route paths to human-readable page titles
 const PAGE_TITLES = {
-  "/dashboard/doctor":              "Overview",
+  "/dashboard/doctor": "Overview",
   "/dashboard/doctor/appointments": "Appointment Requests",
-  "/dashboard/doctor/schedules":    "Manage Schedule",
-  "/dashboard/doctor/prescriptions":"Prescriptions",
-  "/dashboard/doctor/profile":      "Profile Settings",
-  "/dashboard/patient":             "Overview",
-  "/dashboard/patient/appointments":"My Appointments",
-  "/dashboard/patient/prescriptions":"My Prescriptions",
-  "/dashboard/patient/reviews":     "My Reviews",
+  "/dashboard/doctor/schedules": "Manage Schedule",
+  "/dashboard/doctor/prescriptions": "Prescriptions",
+  "/dashboard/doctor/profile": "Profile Settings",
+  "/dashboard/patient": "Overview",
+  "/dashboard/patient/appointments": "My Appointments",
+  "/dashboard/patient/prescriptions": "My Prescriptions",
+  "/dashboard/patient/reviews": "My Reviews",
   "/dashboard/patient/payment-history": "Payment History",
-  "/dashboard/patient/profile":     "Profile",
-  "/dashboard/admin":               "Overview",
-  "/dashboard/admin/manage-users":  "Manage Users",
-  "/dashboard/admin/manage-doctors":"Manage Doctors",
-  "/dashboard/admin/appointments":  "All Appointments",
-  "/dashboard/admin/transactions":  "Transactions",
-  "/dashboard/admin/analytics":     "Analytics",
+  "/dashboard/patient/profile": "Profile",
+  "/dashboard/admin": "Overview",
+  "/dashboard/admin/manage-users": "Manage Users",
+  "/dashboard/admin/manage-doctors": "Manage Doctors",
+  "/dashboard/admin/appointments": "All Appointments",
+  "/dashboard/admin/transactions": "Transactions",
+  "/dashboard/admin/analytics": "Analytics",
 };
 
 const ROLE_BADGE = {
-  doctor:  { label: "Doctor",  bg: "bg-[#0E7490]/10 text-[#0E7490]" },
+  doctor: { label: "Doctor", bg: "bg-[#0E7490]/10 text-[#0E7490]" },
   patient: { label: "Patient", bg: "bg-emerald-100 text-emerald-700" },
-  admin:   { label: "Admin",   bg: "bg-violet-100 text-violet-700"   },
+  admin: { label: "Admin", bg: "bg-violet-100 text-violet-700" },
 };
 
 export default function DashboardNavbar() {
@@ -123,6 +123,7 @@ export default function DashboardNavbar() {
                   <img
                     src={user.image}
                     alt={user.name}
+                    referrerPolicy="no-referrer"
                     className="w-7 h-7 rounded-full object-cover border border-gray-200"
                   />
                 ) : (

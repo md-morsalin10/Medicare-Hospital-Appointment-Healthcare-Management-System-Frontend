@@ -103,6 +103,7 @@ export default function Navbar() {
                     <img
                       src={user.image}
                       alt={user.name || 'User Avatar'}
+                      referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-full object-cover border-2 border-[#0E7490] shadow-sm"
                     />
                   ) : (
