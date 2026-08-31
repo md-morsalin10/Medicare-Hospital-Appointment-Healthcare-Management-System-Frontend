@@ -9,8 +9,9 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowRight,
-  LogIn
+  LogIn,
+  UserCheck,
+  Stethoscope
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
@@ -26,6 +27,12 @@ const LoginPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Demo Login Helper Function
+  const handleDemoFill = (email, password) => {
+    setFormData({ email, password });
+    toast.success('Demo credentials filled!');
   };
 
   const handleSubmit = async (e) => {
@@ -47,7 +54,6 @@ const LoginPage = () => {
       }
 
       toast.success('Welcome back to MediCare Connect!');
-      // better-auth redirect handles navigating to callbackURL
       setLoading(false);
 
     } catch (error) {
@@ -66,7 +72,8 @@ const LoginPage = () => {
       toast.error("Google Sign-In failed. Please try again.");
       console.error(err);
     }
-  }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#EEF8FC] via-[#F4F9FD] to-[#EBF5FA] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
       <Toaster position="top-right" />
@@ -82,7 +89,7 @@ const LoginPage = () => {
         className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-10 relative z-10"
       >
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <Link href="/" className="inline-block text-3xl font-extrabold text-[#0E7490] tracking-tight">
             MediCare
           </Link>
@@ -90,6 +97,31 @@ const LoginPage = () => {
           <p className="text-sm text-gray-500 mt-1">
             Sign in to access your appointments and dashboard.
           </p>
+        </div>
+
+        {/* Demo Credentials Section */}
+        <div className="mb-6 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+          <p className="text-xs font-semibold text-gray-500 text-center uppercase tracking-wider mb-2">
+            Try Demo Credentials
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleDemoFill('olivera@gmail.com', 'Password@123')}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-xl bg-[#0E7490]/10 text-[#0E7490] hover:bg-[#0E7490] hover:text-white transition-all duration-200 border border-[#0E7490]/20"
+            >
+              <Stethoscope className="w-3.5 h-3.5" />
+              Doctor Demo
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoFill('mille@gmail.com', 'Password@123')}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-xl bg-[#10B981]/10 text-[#10B981] hover:bg-[#10B981] hover:text-white transition-all duration-200 border border-[#10B981]/20"
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              Patient Demo
+            </button>
+          </div>
         </div>
 
         {/* Login Form */}

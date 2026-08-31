@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Calendar, User, ClipboardList, Star } from "lucide-react";
 import ReviewModal from "./ReviewModal";
 
-const PatientPrescriptionListClient = ({ initialPrescriptions = [] }) => {
+const PatientPrescriptionListClient = ({ initialPrescriptions}) => {
     const [prescriptions] = useState(initialPrescriptions);
     const [reviewingPrescription, setReviewingPrescription] = useState(null);
 
