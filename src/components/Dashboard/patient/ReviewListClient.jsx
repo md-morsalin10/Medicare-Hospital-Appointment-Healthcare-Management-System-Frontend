@@ -9,7 +9,8 @@ import { getClientToken } from "@/lib/core/tokenClinet";
 const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
 const ReviewListClient = ({ initialReviews = [] }) => {
-    const [reviews, setReviews] = useState(initialReviews);
+    const safeReviews = Array.isArray(initialReviews) ? initialReviews : [];
+    const [reviews, setReviews] = useState(safeReviews);
 
     // Edit modal state
     const [isEditOpen, setIsEditOpen] = useState(false);

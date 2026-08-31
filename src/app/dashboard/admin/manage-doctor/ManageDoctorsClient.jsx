@@ -6,8 +6,9 @@ import { CheckCircle2, XCircle, Clock, Search, ShieldAlert, Loader2 } from "luci
 import toast, { Toaster } from "react-hot-toast";
 import { getClientToken } from "@/lib/core/tokenClinet";
 
+
 export default function ManageDoctorsClient({ initialDoctors = [] }) {
-  const [doctors, setDoctors] = useState(initialDoctors);
+  const [doctors, setDoctors] = useState(Array.isArray(initialDoctors) ? initialDoctors : []);
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState(null);
 
@@ -15,7 +16,7 @@ export default function ManageDoctorsClient({ initialDoctors = [] }) {
     setLoadingId(id);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_URL;
+      const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
       const token = await getClientToken()
       const res = await fetch(`${baseUrl}/api/doctors/verify/${id}`, {
         method: "PATCH",

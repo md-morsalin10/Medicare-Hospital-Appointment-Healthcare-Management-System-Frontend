@@ -7,7 +7,8 @@ import DoctorAppointmentCard from "./DoctorAppointmentCard";
 import { getClientToken } from "@/lib/core/tokenClinet";
 
 const DoctorAppointmentList = ({ initialBookings = [] }) => {
-    const [bookings, setBookings] = useState(initialBookings);
+    const safeBookings = Array.isArray(initialBookings) ? initialBookings : [];
+    const [bookings, setBookings] = useState(safeBookings);
     const [filter, setFilter] = useState("All");
 
     const handleStatusChange = async (id, newStatus) => {

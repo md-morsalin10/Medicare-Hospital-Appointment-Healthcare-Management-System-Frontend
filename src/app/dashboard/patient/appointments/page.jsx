@@ -7,6 +7,7 @@ import React from 'react';
 const AppointmentPage = async () => {
     const user = await getUserSeason();
     const bookingData = await getBookingDataByPatientId({ patientId: user?.id });
+    console.log(bookingData, "bookingData")
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-4 sm:p-8">
@@ -23,7 +24,7 @@ const AppointmentPage = async () => {
                 </div>
 
                 {/* Client-side List Component */}
-                <AppointmentList initialBookings={bookingData || []} />
+                <AppointmentList initialBookings={bookingData} />
 
             </div>
         </div>

@@ -14,6 +14,7 @@ export default function Navbar() {
   // Better Auth Client Hook
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
+  console.log(user, "navbar")
 
 
   const handleSignOut = async () => {

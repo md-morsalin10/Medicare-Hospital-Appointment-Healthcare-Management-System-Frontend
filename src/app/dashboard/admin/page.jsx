@@ -6,10 +6,12 @@ import React from 'react';
 import AdminDashboardOverview from '@/components/Dashboard/admin/AdminDashboardOverview';
 
 const AdminPage = async () => {
-    const reviews = (await getAllReviews()) || [];
-    const doctors = (await getAllDoctorsProfile()) || [];
-    const allTransactions = (await getBookingData()) || [];
-    const allUsers = (await getAllUsers()) || [];
+    const [reviews, doctors, allTransactions, allUsers] = await Promise.all([
+        getAllReviews(),
+        getAllDoctorsProfile(),
+        getBookingData(),
+        getAllUsers(),
+    ]);
 
     const totalUsers = allUsers.length || 0;
     const uniquePatients = new Set();
@@ -58,7 +60,7 @@ const AdminPage = async () => {
             const month = date.toLocaleString('default', { month: 'short' });
             const year = date.getFullYear();
             const key = `${month} ${year}`;
-            
+
             if (!monthlyRevenue[key]) {
                 monthlyRevenue[key] = { month, year, revenue: 0, timestamp: date.getTime() };
             }
@@ -69,7 +71,7 @@ const AdminPage = async () => {
     let revenueChartData = Object.values(monthlyRevenue)
         .sort((a, b) => a.timestamp - b.timestamp)
         .map(item => ({ month: item.month, revenue: item.revenue }));
-    
+
     // If no data or less than 2 months, provide some fallback or handle it
     if (revenueChartData.length === 0) {
         revenueChartData = [{ month: 'Current', revenue: totalRevenue }];

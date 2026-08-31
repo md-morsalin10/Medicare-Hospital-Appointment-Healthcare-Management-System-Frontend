@@ -19,7 +19,8 @@ import Image from "next/image";
 import { getClientToken } from "@/lib/core/tokenClinet";
 
 const AppointmentManagementTable = ({ initialAppointments = [] }) => {
-    const [appointments, setAppointments] = useState(initialAppointments);
+    const safeAppointments = Array.isArray(initialAppointments) ? initialAppointments : [];
+    const [appointments, setAppointments] = useState(safeAppointments);
     const [filter, setFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
 

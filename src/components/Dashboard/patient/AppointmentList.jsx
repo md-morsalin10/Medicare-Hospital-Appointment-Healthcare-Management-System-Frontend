@@ -6,27 +6,22 @@ import { CalendarX } from "lucide-react";
 import AppointmentCard from "./AppointmentCard";
 import { getClientToken } from "@/lib/core/tokenClinet";
 
-const AppointmentList = ({ initialBookings }) => {
-    // ১. নিশ্চিত করুন initialBookings একটি Array, না হলে Data property অথবা খালি Array সেট হবে
-    const normalizeBookings = (data) => {
-        if (Array.isArray(data)) return data;
-        if (data && Array.isArray(data.data)) return data.data;
-        return [];
-    };
+const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
 
-    const [bookings, setBookings] = useState(normalizeBookings(initialBookings));
+const AppointmentList = ({ initialBookings = [] }) => {
+    const safeBookings = Array.isArray(initialBookings) ? initialBookings : [];
+    const [bookings, setBookings] = useState(safeBookings);
 
     // Handle Cancel — mark as Cancelled in DB and UI
     const handleCancel = async (id) => {
         setBookings((prev) =>
-            (Array.isArray(prev) ? prev : []).map((item) =>
+            prev.map((item) =>
                 item._id === id ? { ...item, status: "Cancelled" } : item
             )
         );
 
         try {
             const token = await getClientToken();
-            const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
             const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
                 method: "PATCH",
                 headers: {
@@ -44,11 +39,11 @@ const AppointmentList = ({ initialBookings }) => {
 
     // Handle Delete — permanently remove from DB and UI
     const handleDelete = async (id) => {
-        setBookings((prev) => (Array.isArray(prev) ? prev : []).filter((item) => item._id !== id));
+        setBookings((prev) => prev.filter((item) => item._id !== id));
+
 
         try {
             const token = await getClientToken();
-            const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:5000";
             const res = await fetch(`${BACKEND_URL}/api/bookings/${id}`, {
                 method: "DELETE",
                 headers: {
@@ -62,10 +57,10 @@ const AppointmentList = ({ initialBookings }) => {
         }
     };
 
-    // Handle Reschedule
+    // Handle Reschedule — update date/time in UI state (API call done inside AppointmentCard)
     const handleReschedule = (id, newDate, newTime) => {
         setBookings((prev) =>
-            (Array.isArray(prev) ? prev : []).map((item) =>
+            prev.map((item) =>
                 item._id === id
                     ? { ...item, appointmentDate: newDate, appointmentTime: newTime }
                     : item
@@ -73,10 +68,7 @@ const AppointmentList = ({ initialBookings }) => {
         );
     };
 
-    // ২. Safe Array Verification
-    const safeBookings = Array.isArray(bookings) ? bookings : [];
-
-    if (safeBookings.length === 0) {
+    if (!bookings || bookings.length === 0) {
         return (
             <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-sm max-w-md mx-auto my-12">
                 <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -91,7 +83,7 @@ const AppointmentList = ({ initialBookings }) => {
     return (
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
-                {safeBookings.map((item) => (
+                {bookings.map((item) => (
                     <AppointmentCard
                         key={item._id}
                         appointment={item}

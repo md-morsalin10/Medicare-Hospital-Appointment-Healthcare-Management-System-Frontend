@@ -25,7 +25,7 @@ const AppointmentPage = async () => {
                 </div>
 
                 {/* Doctor Appointment List Component */}
-                <DoctorAppointmentList initialBookings={bookingData || []} />
+                <DoctorAppointmentList initialBookings={bookingData} />
 
             </div>
         </div>
