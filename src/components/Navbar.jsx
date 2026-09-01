@@ -154,7 +154,7 @@ export default function Navbar() {
                   href="/register"
                   className="px-4 py-2 rounded-xl bg-[#0E7490] text-white text-xs font-bold hover:bg-[#085369] shadow-sm hover:shadow transition-all duration-200"
                 >
-                  Join Now
+                  Register
                 </Link>
               </>
             )}
