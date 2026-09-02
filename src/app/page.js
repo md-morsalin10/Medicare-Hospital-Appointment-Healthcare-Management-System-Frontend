@@ -5,6 +5,7 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import SpecialtiesSection from "@/components/SpecialtiesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
+import FeaturesDoctors from "@/components/FeaturesDoctors";
 
 export const metadata = {
   title: "MediCare Connect — Modern Healthcare at Your Fingertips",
@@ -17,6 +18,7 @@ export default function Home() {
     <div>
       <Banner />
       <PlatformStats />
+      <FeaturesDoctors />
       <HowItWorksSection />
       <SpecialtiesSection />
       <FeaturesSection />

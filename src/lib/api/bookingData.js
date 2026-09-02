@@ -1,4 +1,4 @@
-import { serverFetch } from "../core/serverApi"
+import { NormalServerFetch, serverFetch } from "../core/serverApi"
 
 export const getBookingDataByPatientId = async ({ patientId }) => {
     return await serverFetch(`/api/bookings?patientId=${patientId}`)
@@ -11,3 +11,7 @@ export const getBookingData = async () => {
     return await serverFetch(`/api/bookings`)
 }
 
+
+export const getFeaturedDoctors = async () => {
+    return await NormalServerFetch(`/api/features/doctors`)
+}
