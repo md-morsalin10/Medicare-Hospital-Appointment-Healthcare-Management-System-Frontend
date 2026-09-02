@@ -6,7 +6,7 @@ import React from 'react';
 const ManageAppointment = async () => {
     const allAppointments = await getBookingData();
 
-    console.log("All Appointments:", allAppointments);
+    // console.log("All Appointments:", allAppointments);
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-4 sm:p-8">

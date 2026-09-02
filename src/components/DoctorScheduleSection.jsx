@@ -38,7 +38,7 @@ const DoctorScheduleSection = ({ schedules = [], doctor, user }) => {
             createdAt: new Date().toISOString()
         };
 
-        console.log("Dummy Booking created:", dummyBooking);
+        // console.log("Dummy Booking created:", dummyBooking);
         alert("Booking selected! (Dummy data created)");
     };
 

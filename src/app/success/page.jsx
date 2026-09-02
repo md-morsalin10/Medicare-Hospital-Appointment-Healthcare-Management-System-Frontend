@@ -33,7 +33,7 @@ export default async function Success({ searchParams }) {
       customerEmail: customerEmail,
     })
     
-    console.log('=== Stripe Session Metadata ===', metadata);
+    // console.log('=== Stripe Session Metadata ===', metadata);
 
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6">

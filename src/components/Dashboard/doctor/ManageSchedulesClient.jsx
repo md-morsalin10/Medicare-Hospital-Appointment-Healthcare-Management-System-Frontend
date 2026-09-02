@@ -43,7 +43,7 @@ export default function ManageSchedulesClient({ doctor }) {
       // API call
       const res = await getDoctorsScheduleById({ doctorId: targetDoctorId });
 
-      console.log("Fetched API Raw Response:", res); // Debugging log
+      // console.log("Fetched API Raw Response:", res); // Debugging log
 
       // Fix 2: API Response Array নাকি Object (res.data / res.result) তা হ্যান্ডেল করা
       let finalSchedules = [];

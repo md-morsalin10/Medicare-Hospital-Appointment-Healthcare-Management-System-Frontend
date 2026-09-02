@@ -8,14 +8,14 @@ import { ShieldAlert, ArrowRight, UserCheck } from 'lucide-react';
 
 const SchedulesPage = async () => {
     const user = await getUserSeason();
-    console.log('User Session:', user);
+    // console.log('User Session:', user);
     const doctorId = user?.id;
 
     const doctorData = await getDoctorsProfileById({ doctorId });
 
     const doctor = Array.isArray(doctorData) ? doctorData[0] : doctorData;
 
-    console.log('Fetched Doctor Profile:', doctor);
+    // console.log('Fetched Doctor Profile:', doctor);
 
     if (!doctor) {
         redirect('/dashboard/doctor/profile');

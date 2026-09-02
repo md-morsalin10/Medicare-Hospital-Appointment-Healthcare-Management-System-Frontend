@@ -16,7 +16,7 @@ export const getUserSeason = async () => {
 
 export const verifyRole = async (role) => {
   const user = await getUserSeason();
-  console.log(user, "from verifyRole");
+  // console.log(user, "from verifyRole");
 
   if (!user) {
     redirect("/login");

@@ -20,7 +20,7 @@ const DoctorDetailsPage = async ({ params }) => {
     const scheduleData = getDoctorsScheduleById({ doctorId: id });
     const user = await getUserSeason();
 
-    console.log("=== CHECKING USER SESSION DETAILS ===", user)
+    // console.log("=== CHECKING USER SESSION DETAILS ===", user)
 
     const [doctor, doctorSchedule] = await Promise.all([doctorData, scheduleData]);
 

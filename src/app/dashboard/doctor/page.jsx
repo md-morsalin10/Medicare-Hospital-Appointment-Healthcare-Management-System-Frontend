@@ -9,7 +9,7 @@ import { getBookingDataByDoctorId } from '@/lib/api/bookingData';
 
 const DoctorPage = async () => {
     const user = await getUserSeason();
-    console.log('User Session:', user);
+    // console.log('User Session:', user);
     const doctorId = user?.id;
     const doctorData = await getDoctorsProfileById({ doctorId });
     const schedulesData = await getDoctorsScheduleById({ doctorId });

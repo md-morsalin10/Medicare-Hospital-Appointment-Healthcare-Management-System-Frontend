@@ -13,7 +13,7 @@ const DoctorProfiles = async () => {
     const data = await getDoctorsProfileById({ doctorId: user?.id });
     const initialProfile = data || null;
 
-    console.log("Initial Profile Data:", initialProfile);
+    // console.log("Initial Profile Data:", initialProfile);
 
     return (
         <div className="w-full min-h-screen bg-slate-50/50 py-6">
