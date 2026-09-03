@@ -5,6 +5,7 @@ import { Search, LayoutGrid, List, ChevronLeft, ChevronRight, SlidersHorizontal 
 import { motion, AnimatePresence } from 'framer-motion';
 import { DoctorCard } from '@/components/Dashboard/doctor/DoctorCard';
 import { DoctorTableRow } from '@/components/Dashboard/doctor/DoctorTableRow';
+import { MotionWrapper } from '@/components/common/MotionWrapper';
 
 
 export default function FindDoctorsClient({ doctors = [] }) {
@@ -50,6 +51,7 @@ export default function FindDoctorsClient({ doctors = [] }) {
         hidden: { opacity: 0, y: 15 },
         show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 20 } }
     };
+
 
     return (
         <div className="space-y-6">
@@ -127,10 +129,12 @@ export default function FindDoctorsClient({ doctors = [] }) {
                     No doctors found. Try adjusting filters.
                 </div>
             ) : layoutMode === 'grid' ? (
-                <motion.div initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    <AnimatePresence>
-                        {paginatedDoctors.map((doc) => (
-                            <DoctorCard key={doc._id} doc={doc} itemVariants={itemVariants} />
+                <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    <AnimatePresence mode="popLayout">
+                        {paginatedDoctors.map((doc, index) => (
+                            <MotionWrapper key={doc._id} delay={index * 0.05}>
+                                <DoctorCard doc={doc} />
+                            </MotionWrapper>
                         ))}
                     </AnimatePresence>
                 </motion.div>
@@ -147,7 +151,7 @@ export default function FindDoctorsClient({ doctors = [] }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            <AnimatePresence>
+                            <AnimatePresence mode="popLayout">
                                 {paginatedDoctors.map((doc) => (
                                     <DoctorTableRow key={doc._id} doc={doc} />
                                 ))}

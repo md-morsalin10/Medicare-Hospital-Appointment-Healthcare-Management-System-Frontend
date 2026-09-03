@@ -5,14 +5,9 @@ import Link from 'next/link';
 import { Heart, Star, Briefcase, Building2, CheckCircle2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const DoctorCard = ({ doc, itemVariants }) => {
+export const DoctorCard = ({ doc }) => {
     return (
-        <motion.div
-            variants={itemVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" } }}
+        <div
             className="group relative bg-white rounded-3xl border border-slate-200/80 p-5 flex flex-col justify-between shadow-xs hover:shadow-xl hover:shadow-cyan-900/5 hover:border-cyan-200 transition-all duration-300 transform-gpu"
         >
             <div>
@@ -89,6 +84,6 @@ export const DoctorCard = ({ doc, itemVariants }) => {
                     <ArrowRight size={14} />
                 </Link>
             </div>
-        </motion.div>
+        </div>
     );
 };

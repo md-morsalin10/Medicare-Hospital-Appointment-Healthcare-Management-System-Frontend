@@ -4,12 +4,29 @@ import FindDoctorsClient from './FindDoctorsClient';
 const DoctorPage = async () => {
     const doctorsData = await getAllDoctorsProfile();
 
-    const verifiedDoctors = Array.isArray(doctorsData) 
-        ? doctorsData.filter((doc, index, self) => 
-            doc.verificationStatus === 'Verified' &&
-            index === self.findIndex((d) => d._id === doc._id)
-          )
-        : [];
+    // Optimize filtering and duplicate removal using a Map for O(n) time complexity
+    const verifiedDoctorsMap = new Map();
+    
+    if (Array.isArray(doctorsData)) {
+        doctorsData.forEach(doc => {
+            if (doc.verificationStatus === 'Verified' && !verifiedDoctorsMap.has(doc._id)) {
+                // Only pass necessary fields to the Client Component to avoid massive HTML serialization payload
+                verifiedDoctorsMap.set(doc._id, {
+                    _id: doc._id.toString(),
+                    doctorName: doc.doctorName,
+                    specialization: doc.specialization,
+                    consultationFee: doc.consultationFee,
+                    experience: doc.experience,
+                    verificationStatus: doc.verificationStatus,
+                    profileImage: doc.profileImage,
+                    qualifications: doc.qualifications,
+                    hospitalName: doc.hospitalName
+                });
+            }
+        });
+    }
+
+    const verifiedDoctors = Array.from(verifiedDoctorsMap.values());
 
     return (
         <div className="bg-slate-50 min-h-screen">

@@ -4,15 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Stethoscope } from 'lucide-react';
 import { DoctorCard } from './Dashboard/doctor/DoctorCard';
+import { MotionWrapper } from './common/MotionWrapper';
 
 const FeaturesDoctors = async () => {
     // ব্যাকএন্ড থেকে ৪টি ডাটা এনে দেখাবে
     const doctors = await getFeaturedDoctors();
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-    };
 
     return (
         <section className="bg-slate-50/60 py-20 lg:py-28 overflow-hidden">
@@ -45,12 +41,10 @@ const FeaturesDoctors = async () => {
                 {/* 4 Columns Responsive Grid */}
                 {doctors && doctors.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {doctors.slice(0, 4).map((doc) => (
-                            <DoctorCard 
-                                key={doc._id || doc.id} 
-                                doc={doc} 
-                                itemVariants={itemVariants} 
-                            />
+                        {doctors.slice(0, 4).map((doc, index) => (
+                            <MotionWrapper key={doc._id || doc.id} delay={index * 0.05}>
+                                <DoctorCard doc={doc} />
+                            </MotionWrapper>
                         ))}
                     </div>
                 ) : (
