@@ -11,7 +11,8 @@ import {
   EyeOff,
   LogIn,
   UserCheck,
-  Stethoscope
+  Stethoscope,
+  ShieldCheck
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
@@ -29,20 +30,14 @@ const LoginPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Demo Login Helper Function
-  const handleDemoFill = (email, password) => {
-    setFormData({ email, password });
-    toast.success('Demo credentials filled!');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Generic Login Executing Function
+  const executeLogin = async (email, password) => {
     setLoading(true);
 
     try {
       const { data, error } = await authClient.signIn.email({
-        email: formData.email,
-        password: formData.password,
+        email,
+        password,
         rememberMe: true,
         callbackURL: "/",
       });
@@ -60,6 +55,18 @@ const LoginPage = () => {
       toast.error(error?.message || 'Invalid credentials! Please try again.');
       setLoading(false);
     }
+  };
+
+  // Direct One-Click Demo Login Handler
+  const handleDemoLogin = (email, password) => {
+    setFormData({ email, password });
+    toast.loading('Logging in with Demo Account...');
+    executeLogin(email, password);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    executeLogin(formData.email, formData.password);
   };
 
   const handleGoogleSignIn = async () => {
@@ -99,27 +106,38 @@ const LoginPage = () => {
           </p>
         </div>
 
-        {/* Demo Credentials Section */}
+        {/* Instant Demo Login Section */}
         <div className="mb-6 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
           <p className="text-xs font-semibold text-gray-500 text-center uppercase tracking-wider mb-2">
-            Try Demo Credentials
+            Instant One-Click Demo Login
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
-              onClick={() => handleDemoFill('olivera@gmail.com', 'Password@123')}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-xl bg-[#0E7490]/10 text-[#0E7490] hover:bg-[#0E7490] hover:text-white transition-all duration-200 border border-[#0E7490]/20"
+              disabled={loading}
+              onClick={() => handleDemoLogin('admin@gmail.com', 'Morsalin501921#')}
+              className="flex items-center justify-center gap-1 py-2 px-2 text-xs font-semibold rounded-xl bg-purple-500/10 text-purple-600 hover:bg-purple-600 hover:text-white transition-all duration-200 border border-purple-500/20 disabled:opacity-50"
             >
-              <Stethoscope className="w-3.5 h-3.5" />
-              Doctor Demo
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Admin
             </button>
             <button
               type="button"
-              onClick={() => handleDemoFill('mille@gmail.com', 'Password@123')}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-xl bg-[#10B981]/10 text-[#10B981] hover:bg-[#10B981] hover:text-white transition-all duration-200 border border-[#10B981]/20"
+              disabled={loading}
+              onClick={() => handleDemoLogin('olivera@gmail.com', 'Password@123')}
+              className="flex items-center justify-center gap-1 py-2 px-2 text-xs font-semibold rounded-xl bg-[#0E7490]/10 text-[#0E7490] hover:bg-[#0E7490] hover:text-white transition-all duration-200 border border-[#0E7490]/20 disabled:opacity-50"
+            >
+              <Stethoscope className="w-3.5 h-3.5" />
+              Doctor
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleDemoLogin('mille@gmail.com', 'Password@123')}
+              className="flex items-center justify-center gap-1 py-2 px-2 text-xs font-semibold rounded-xl bg-[#10B981]/10 text-[#10B981] hover:bg-[#10B981] hover:text-white transition-all duration-200 border border-[#10B981]/20 disabled:opacity-50"
             >
               <UserCheck className="w-3.5 h-3.5" />
-              Patient Demo
+              Patient
             </button>
           </div>
         </div>

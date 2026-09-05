@@ -144,7 +144,7 @@ const RegisterPage = () => {
         onSuccess: () => {
           toast.success('Account created successfully! Welcome to MediCare Connect.');
           setLoading(false);
-          router.push('/login');
+          router.push('/');
         },
         onError: (ctx) => {
           toast.error(ctx.error.message || 'Registration failed!');
