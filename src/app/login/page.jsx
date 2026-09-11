@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // useRouter ইম্পোর্ট করুন
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import {
@@ -17,6 +18,8 @@ import {
 import { authClient } from '@/lib/auth-client';
 
 const LoginPage = () => {
+  const router = useRouter(); // Router ইনিশিয়ালাইজ করুন
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -30,7 +33,7 @@ const LoginPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Generic Login Executing Function
+  // Role-based Redirect & Login Executing Function
   const executeLogin = async (email, password) => {
     setLoading(true);
 
@@ -39,7 +42,6 @@ const LoginPage = () => {
         email,
         password,
         rememberMe: true,
-        callbackURL: "/",
       });
 
       if (error) {
@@ -49,6 +51,18 @@ const LoginPage = () => {
       }
 
       toast.success('Welcome back to MediCare Connect!');
+
+      // রোল অনুযায়ী রিডাইরেক্ট লজিক
+      const userRole = data?.user?.role;
+
+      if (userRole === 'admin') {
+        router.push('/dashboard/admin');
+      } else if (userRole === 'doctor') {
+        router.push('/dashboard/doctor');
+      } else {
+        router.push('/'); 
+      }
+
       setLoading(false);
 
     } catch (error) {
