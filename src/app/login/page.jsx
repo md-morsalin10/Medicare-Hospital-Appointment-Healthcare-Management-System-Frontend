@@ -18,7 +18,7 @@ import {
 import { authClient } from '@/lib/auth-client';
 
 const LoginPage = () => {
-  const router = useRouter(); // Router ইনিশিয়ালাইজ করুন
+  const router = useRouter(); 
 
   const [formData, setFormData] = useState({
     email: '',
@@ -52,7 +52,6 @@ const LoginPage = () => {
 
       toast.success('Welcome back to MediCare Connect!');
 
-      // রোল অনুযায়ী রিডাইরেক্ট লজিক
       const userRole = data?.user?.role;
 
       if (userRole === 'admin') {
